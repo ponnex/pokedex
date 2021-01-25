@@ -1,0 +1,107 @@
+import { getterTree, mutationTree, actionTree } from 'nuxt-typed-vuex';
+import { PokemonList, Result } from '@/model/pokemon-list';
+import { Pokemon } from '@/model/pokemon';
+import { ENDPOINTS } from '@/model/constants';
+import humps from 'lodash-humps';
+
+declare const _: any;
+
+export const state = () => ({
+	pokemon: {} as Pokemon,
+	listing: {} as PokemonList,
+	count: 0 as number,
+});
+
+export const getters = getterTree(state, {});
+
+export const mutations = mutationTree(state, {
+	SET_LISTING(state, listing: PokemonList) {
+		state.listing = listing;
+	},
+	GET_POKEMON(state, pokemon: Pokemon) {
+		state.pokemon = pokemon;
+	},
+	SET_COUNT(state, count: number) {
+		state.count = count;
+	},
+});
+
+export const actions = actionTree({ state, getters, mutations }, {
+	setListing({ commit }, listing: PokemonList) {
+		commit('SET_LISTING', listing);
+	},
+	async getListing({ state, commit }) {
+		try {
+			const response = await this.$axios({
+				method: 'get',
+				url: `${ENDPOINTS.POKEMON}`,
+			});
+			const result = humps(response.data) as PokemonList;
+			commit('SET_LISTING', result);
+			commit('SET_COUNT', result.count);
+			return;
+		} catch (err) {
+			commit('SET_LISTING', state.listing);
+			commit('SET_COUNT', state.count);
+			throw new Error(err);
+		}
+	},
+	async getPokemon({ commit }, pokemon: string| number) {
+		try {
+			const response = await this.$axios({
+				method: 'get',
+				url: `${ENDPOINTS.POKEMON}/${pokemon}`,
+			});
+			const result = humps(response.data) as Pokemon;
+			commit('GET_POKEMON', result);
+			return result;
+		} catch (err) {
+			throw new Error(err);
+		}
+	},
+	async getPokemonImagesForListing({ state, commit }, listing?: PokemonList) {
+		try {
+			const { results, ...list } = _.cloneDeep(listing || state.listing) as PokemonList;
+			for (const pokemonResult of results) {
+				const response = await this.$axios({
+					method: 'get',
+					url: `${ENDPOINTS.POKEMON}/${pokemonResult.name}`,
+				});
+				const pokemon = humps(response.data) as Pokemon;
+				const currPokemon: Result = _.find(results, (pokemonResult: Result) => {
+					return pokemon.name === pokemonResult.name;
+				});
+				currPokemon.image = pokemon.sprites.other.dreamWorld.frontDefault ? pokemon.sprites.other.dreamWorld.frontDefault : pokemon.sprites.other.officialArtwork.frontDefault;
+				currPokemon.id = pokemon.id;
+			}
+			commit('SET_LISTING', { results, ...list });
+			return;
+		} catch (err) {
+			throw new Error(err);
+		}
+	},
+	async searchPokemon({ state, commit, dispatch }, pokemon: string) {
+		// @TODO: use lodash chuck for Result[] and pagination on search
+		try {
+			const response = await this.$axios({
+				method: 'get',
+				params: {
+					limit: state.count,
+				},
+				url: `${ENDPOINTS.POKEMON}`,
+			});
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			const { results, count, ...list } = humps(response.data) as PokemonList;
+			const pokemonResults = results as Result[];
+			const regex = new RegExp(pokemon.toString(), 'i');
+			const pokemonSearch = _.filter(pokemonResults, (pokemonResult: Result) => {
+				return regex.test(pokemonResult.name);
+			});
+			const newListing = { results: pokemonSearch, count: pokemonSearch.length, ...list };
+			commit('SET_LISTING', newListing);
+			await dispatch('getPokemonImagesForListing', newListing);
+		} catch (err) {
+			throw new Error(err);
+		}
+	},
+});

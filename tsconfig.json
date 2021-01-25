@@ -24,9 +24,11 @@
       ]
     },
     "types": [
+      "@types/*",
       "@nuxt/types",
       "@types/node",
       "@nuxtjs/axios",
+      "@nuxtjs/color-mode/types"
     ]
   },
   "exclude": [

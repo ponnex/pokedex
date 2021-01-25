@@ -1,4 +1,5 @@
 import { NuxtConfig } from '@nuxt/types';
+import { ProvidePlugin, NormalModuleReplacementPlugin } from 'webpack';
 
 const config: NuxtConfig = {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
@@ -22,15 +23,12 @@ const config: NuxtConfig = {
 
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
+    '@/assets/styles/main.scss',
   ],
-
-  // Global variables, mixins, functions, etc here
-  styleResources: {
-    scss: [],
-  },
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
+    '@/plugins/axios.ts',
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -40,8 +38,12 @@ const config: NuxtConfig = {
   buildModules: [
     // https://go.nuxtjs.dev/typescript
     '@nuxt/typescript-build',
-    '@nuxtjs/style-resources',
+    // https://github.com/danielroe/typed-vuex
     'nuxt-typed-vuex',
+    // https://go.nuxtjs.dev/tailwindcss
+    '@nuxtjs/tailwindcss',
+    // https://color-mode.nuxtjs.org/
+    '@nuxtjs/color-mode',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -67,7 +69,30 @@ const config: NuxtConfig = {
     transpile: [
       /typed-vuex/,
     ],
-  }
+    extend(config, ctx) {
+      if (process.env.NODE_ENV === 'production') {
+        config.plugins?.push(new NormalModuleReplacementPlugin(
+          /environment\/defaults\.json/,
+          '@/environment/defaults.prod.json'
+        ));
+      }
+    },
+    plugins: [
+      new ProvidePlugin({
+        '_': 'lodash',
+      }),
+    ],
+  },
+  colorMode: {
+    preference: 'light',
+    fallback: 'system',
+    hid: 'nuxt-color-mode-script',
+    globalName: '__NUXT_COLOR_MODE__',
+    componentName: 'ColorScheme',
+    classPrefix: '',
+    classSuffix: '',
+    storageKey: 'nuxt-color-mode',
+  },
 }
 
 export default config;

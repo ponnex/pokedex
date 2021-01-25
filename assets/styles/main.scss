@@ -1,0 +1,16 @@
+/*
+** Main
+*/
+
+@import 'tailwind.scss';
+
+/*
+** GLOBAL CSS STYLING
+*/
+
+@layer base {
+	body {
+		@apply bg-white dark:bg-black m-5;
+		@apply text-black dark:text-white;
+  }
+}

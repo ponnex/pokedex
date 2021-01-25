@@ -1,11 +1,11 @@
 import { getAccessorType } from 'typed-vuex';
 
 // Import store modules here
-import * as submodule from '@/store/submodule';
+import * as pokemon from '@/store/pokemon';
 
 export const storePattern = {
 	modules: {
-		submodule,
+		pokemon,
 	},
 };
 
