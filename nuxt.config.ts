@@ -1,4 +1,6 @@
-export default {
+import { NuxtConfig } from '@nuxt/types';
+
+const config: NuxtConfig = {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
 
@@ -22,6 +24,11 @@ export default {
   css: [
   ],
 
+  // Global variables, mixins, functions, etc here
+  styleResources: {
+    scss: [],
+  },
+
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
   ],
@@ -32,7 +39,9 @@ export default {
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
     // https://go.nuxtjs.dev/typescript
-    '@nuxt/typescript-build'
+    '@nuxt/typescript-build',
+    '@nuxtjs/style-resources',
+    'nuxt-typed-vuex',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -55,5 +64,10 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
+    transpile: [
+      /typed-vuex/,
+    ],
   }
 }
+
+export default config;
