@@ -1,6 +1,7 @@
 <template>
 	<div v-if="!$fetchState.pending" class="h-screen text-white">
-		<div class="details-bg h-56 bg-green-500"></div>
+		<div class="h-56" :class="`bg-${getPokemonColor()}`"></div>
+		<div class="details-bg" :class="`bg-${getPokemonColor()}`"></div>
 		<div class="absolute flex flex-col h-full p-5 top-0 w-screen space-y-4">
 			<div class="grid grid-cols-12 fill-current text-white dark:text-gray-900">
 				<svg
@@ -71,38 +72,38 @@
 			<div class="no-scrollbar text-gray-700 dark:text-white flex overflow-x-scroll overflow-y-hidden w-full">
 				<section id="about" class="flex flex-col min-w-full space-y-3">
 					<div class="flex flex-col items-center justify-center">
-						<span class="text-sm break-all">{{ getFlavorText(pokemon) }}</span>
+						<span class="text-sm break-all">{{ getFlavorText() }}</span>
 					</div>
 					<pokemon-type-badge
 						:types="pokemon.types"
 						:full="true"
 					/>
-					<span class="text-green-500 font-black pb-2">Pokédex Data</span>
+					<span class="font-black pb-2" :class="`text-${getPokemonColor()}`">Pokédex Data</span>
 					<div class="block mt-2 font-black text-xs">
 						<div class="grid grid-cols-2 gap-4">
 							<div class="grid grid-cols-2">
 								<span class="col-span-1 text-gray-700 dark:text-white">Height</span>
-								<span class="col-span-1 text-green-500">{{ pokemon.height / 10 }} m</span>
+								<span class="col-span-1" :class="`text-${getPokemonColor()}`">{{ pokemon.height / 10 }} m</span>
 							</div>
 							<div class="grid grid-cols-2">
 								<span class="col-span-1 text-gray-700 dark:text-white">Weight</span>
-								<span class="col-span-1 text-green-500">{{ pokemon.weight / 10 }} kg</span>
+								<span class="col-span-1" :class="`text-${getPokemonColor()}`">{{ pokemon.weight / 10 }} kg</span>
 							</div>
 							<div class="grid grid-cols-2">
 								<span class="col-span-1 text-gray-700 dark:text-white">Gender</span>
-								<span class="col-span-1 text-green-500">{{ }}</span>
+								<span class="col-span-1" :class="`text-${getPokemonColor()}`">{{ }}</span>
 							</div>
 							<div class="grid grid-cols-2">
 								<span class="col-span-1 text-gray-700 dark:text-white">Growth Rate</span>
-								<span class="col-span-1 text-green-500">{{ startCase(pokemon.pokemonSpecies.growthRate.name) }}</span>
+								<span class="col-span-1" :class="`text-${getPokemonColor()}`">{{ getGrowthRate() }}</span>
 							</div>
 							<div class="grid grid-cols-2">
 								<span class="col-span-1 text-gray-700 dark:text-white">Base Exp</span>
-								<span class="col-span-1 text-green-500">{{ pokemon.baseExperience }}</span>
+								<span class="col-span-1" :class="`text-${getPokemonColor()}`">{{ pokemon.baseExperience }}</span>
 							</div>
 							<div class="grid grid-cols-2">
 								<span class="col-span-1 text-gray-700 dark:text-white">Rarity</span>
-								<span class="col-span-1 text-green-500">{{ getRarity(pokemon) }}</span>
+								<span class="col-span-1" :class="`text-${getPokemonColor()}`">{{ getRarity() }}</span>
 							</div>
 						</div>
 					</div>
@@ -120,7 +121,6 @@
 
 <script lang="ts">
 import { Component, Watch, mixins } from 'nuxt-property-decorator';
-import { Pokemon } from '@/model/pokemon';
 import ChangeTheme from '@/utils/change-theme';
 declare const _: any;
 
@@ -167,14 +167,35 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme) {
 		}
 	}
 
-	getFlavorText(pokemon: Pokemon) {
-		return pokemon.pokemonSpecies ? pokemon.pokemonSpecies.flavorTextEntries[0].flavorText.replace(' ', ' ') : '';
+	getPokemonColor() {
+		const color = this.pokemon.pokemonSpecies ? this.pokemon.pokemonSpecies.color.name : undefined;
+		if (!color) {
+			return 'gray-500';
+		}
+		if (color === 'white') {
+			return 'gray-500';
+		} else if (color === 'brown') {
+			return 'yellow-800';
+		} else {
+			return color ? `${color}-500` : '';
+		}
 	}
 
-	getRarity(pokemon: Pokemon) {
-		if (pokemon.pokemonSpecies.isLegendary) {
+	getFlavorText() {
+		return this.pokemon.pokemonSpecies ? this.pokemon.pokemonSpecies.flavorTextEntries[0].flavorText.replace(' ', ' ') : '';
+	}
+
+	getGrowthRate() {
+		return this.pokemon.pokemonSpecies ? this.startCase(this.pokemon.pokemonSpecies.growthRate.name) : '';
+	}
+
+	getRarity() {
+		if (!this.pokemon.pokemonSpecies) {
+			return;
+		}
+		if (this.pokemon.pokemonSpecies.isLegendary) {
 			return 'Legendary';
-		} else if (pokemon.pokemonSpecies.isMythical) {
+		} else if (this.pokemon.pokemonSpecies.isMythical) {
 			return 'Mythical';
 		} else {
 			return 'Normal';
@@ -182,7 +203,7 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme) {
 	}
 
 	isActiveTab(hash: string) {
-		return this.activeTab === hash ? 'text-green-500' : 'text-gray-400';
+		return this.activeTab === hash ? `text-${this.getPokemonColor()}` : 'text-gray-400';
 	}
 
 	onHome() {
@@ -193,16 +214,12 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme) {
 
 <style lang="scss" scoped>
 .details-bg {
-	&::after {
-		content: '';
-    display: block;
-    position: absolute;
-    width: 100%;
-    height: 50px;
-    border-bottom-left-radius: 50%;
-    border-bottom-right-radius: 50%;
-    top: 14rem;
-    background: rgb(16, 185, 129);
-	}
+	display: block;
+	position: absolute;
+	width: 100%;
+	height: 50px;
+	border-bottom-left-radius: 50%;
+	border-bottom-right-radius: 50%;
+	top: 14rem;
 }
 </style>

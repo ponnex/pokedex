@@ -55,7 +55,17 @@ export default class PokemonCard extends Vue {
 	padStart: Function = _.padStart;
 
 	getBgColor() {
-		return 'bg-green-500';
+		const color = this.pokemon.color;
+		if (!color) {
+			return 'bg-gray-500';
+		}
+		if (color === 'white') {
+			return 'bg-gray-500';
+		} else if (color === 'brown') {
+			return 'bg-yellow-800';
+		} else {
+			return color ? `bg-${color}-500` : '';
+		}
 	}
 }
 </script>

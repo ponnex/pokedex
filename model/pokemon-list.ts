@@ -5,6 +5,7 @@ export interface Result {
   image?: string | null;
   id?: number;
   types?: Type[];
+  color?: string;
 }
 export interface PokemonList {
   count: number;
