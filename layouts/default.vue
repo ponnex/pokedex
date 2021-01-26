@@ -1,29 +1,12 @@
 <template>
-	<div>
+	<main class="h-screen p-5">
 		<Nuxt keep-alive />
-	</div>
+	</main>
 </template>
 
-<style>
-html {
-  font-family:
-    Roboto,
-    'Helvetica Neue',
-    Arial,
-    sans-serif;
-  font-size: 16px;
-  word-spacing: 1px;
-  -ms-text-size-adjust: 100%;
-  -webkit-text-size-adjust: 100%;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  box-sizing: border-box;
-}
+<script lang="ts">
+import { Vue, Component } from 'nuxt-property-decorator';
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-}
-</style>
+@Component
+export default class DefaultLayout extends Vue {}
+</script>

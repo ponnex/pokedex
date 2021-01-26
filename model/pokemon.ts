@@ -1,3 +1,5 @@
+import { PokemonSpecies } from './pokemon-species';
+
 export interface Ability {
   name: string;
   url: string;
@@ -182,4 +184,5 @@ export interface Pokemon {
   stats: Stat[];
   types: Type[];
   weight: number;
+  pokemonSpecies: PokemonSpecies;
 }

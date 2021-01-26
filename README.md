@@ -1,5 +1,10 @@
 # pokedex
 
+# References
+- https://pokeapi.co/docs/v2
+- https://dribbble.com/shots/14241781-Pok-dex/attachments/5886808?mode=media
+- https://github.com/duiker101/pokemon-type-svg-icons
+
 ## Build Setup
 
 ```bash

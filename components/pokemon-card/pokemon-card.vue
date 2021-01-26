@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="relative inline-grid grid-cols-3 gap-x-4 rounded-2xl min-w-full h-24 text-white dark:text-black"
+		class="relative inline-grid grid-cols-3 gap-x-4 rounded-2xl min-w-full h-24 text-white dark:text-black shadow-md"
 		:class="getBgColor()"
 		@click="event => this.$emit('click', event)"
 	>
@@ -23,8 +23,13 @@
 			/>
 		</svg>
 		<img v-else class="h-full p-2 justify-self-center self-center col-span-1" :src="pokemon.image" :alt="pokemon.name">
-		<span class="col-span-2 text-2xl font-medium pt-2">{{ startCase(pokemon.name) }}</span>
-		<span v-if="detailsUpdated" class="absolute bottom-0 right-0 text-5xl font-semibold text-gray-100 dark:text-gray-900 opacity-70">{{ `#${padStart(pokemon.id, 3, '0')}` }}</span>
+		<div class="flex flex-col col-span-2">
+			<span class="text-2xl font-medium pt-2">{{ startCase(pokemon.name) }}</span>
+			<pokemon-type-badge
+				:types="pokemon.types"
+			/>
+		</div>
+		<span v-if="detailsUpdated" class="absolute bottom-0 dark:text-gray-900 font-semibold leading-9 opacity-50 right-0 text-5xl text-white">{{ `#${padStart(pokemon.id, 3, '0')}` }}</span>
 	</div>
 </template>
 
@@ -38,7 +43,7 @@ declare const _: any;
 export default class PokemonCard extends Vue {
 	@Prop({
 		type: Object,
-		default: {},
+		default: () => { return {}; },
 	}) pokemon!: Result;
 
 	@Prop({
@@ -50,7 +55,7 @@ export default class PokemonCard extends Vue {
 	padStart: Function = _.padStart;
 
 	getBgColor() {
-		return 'bg-red-400';
+		return 'bg-green-500';
 	}
 }
 </script>

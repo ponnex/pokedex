@@ -3,6 +3,7 @@ import { PokemonList, Result } from '@/model/pokemon-list';
 import { Pokemon } from '@/model/pokemon';
 import { ENDPOINTS } from '@/model/constants';
 import humps from 'lodash-humps';
+import { PokemonSpecies } from '~/model/pokemon-species';
 
 declare const _: any;
 
@@ -46,7 +47,7 @@ export const actions = actionTree({ state, getters, mutations }, {
 			throw new Error(err);
 		}
 	},
-	async getPokemon({ commit }, pokemon: string| number) {
+	async getPokemon({ commit }, pokemon: string | number) {
 		try {
 			const response = await this.$axios({
 				method: 'get',
@@ -71,8 +72,9 @@ export const actions = actionTree({ state, getters, mutations }, {
 				const currPokemon: Result = _.find(results, (pokemonResult: Result) => {
 					return pokemon.name === pokemonResult.name;
 				});
-				currPokemon.image = pokemon.sprites.other.dreamWorld.frontDefault ? pokemon.sprites.other.dreamWorld.frontDefault : pokemon.sprites.other.officialArtwork.frontDefault;
+				currPokemon.image = pokemon.sprites.other.officialArtwork.frontDefault ? pokemon.sprites.other.officialArtwork.frontDefault : pokemon.sprites.other.dreamWorld.frontDefault;
 				currPokemon.id = pokemon.id;
+				currPokemon.types = pokemon.types;
 			}
 			commit('SET_LISTING', { results, ...list });
 			return;
@@ -100,6 +102,21 @@ export const actions = actionTree({ state, getters, mutations }, {
 			const newListing = { results: pokemonSearch, count: pokemonSearch.length, ...list };
 			commit('SET_LISTING', newListing);
 			await dispatch('getPokemonImagesForListing', newListing);
+		} catch (err) {
+			throw new Error(err);
+		}
+	},
+	async getPokemonSpecies({ state, commit }, pokemon: string | number) {
+		try {
+			const response = await this.$axios({
+				method: 'get',
+				url: `${ENDPOINTS.POKEMON_SPECIES}/${pokemon}`,
+			});
+			const pokemonSpecies = humps(response.data) as PokemonSpecies;
+			const statePokemon = _.cloneDeep(state.pokemon) as Pokemon;
+			statePokemon.pokemonSpecies = pokemonSpecies;
+			commit('GET_POKEMON', statePokemon);
+			return pokemonSpecies;
 		} catch (err) {
 			throw new Error(err);
 		}
