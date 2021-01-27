@@ -54,8 +54,8 @@ export const mutations = mutationTree(state, {
 });
 
 export const actions = actionTree({ state, getters, mutations }, {
-	setListResponse({ commit }) {
-		commit('SET_LIST_RESPONSE', {} as PokemonListResponse);
+	setListResponse({ commit }, listResponse: PokemonListResponse) {
+		commit('SET_LIST_RESPONSE', listResponse);
 	},
 	setPokemonDamageRelations({ commit }, pokemonDamangeRelation: DamageRelations) {
 		commit('SET_POKEMON_DAMAGE_RELATION', pokemonDamangeRelation);

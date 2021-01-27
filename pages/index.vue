@@ -51,7 +51,7 @@
 
 <script lang="ts">
 import { Component, Ref, mixins } from 'nuxt-property-decorator';
-import { PokemonList } from '@/model/pokemon-list';
+import { PokemonList, PokemonListResponse } from '@/model/pokemon-list';
 import ChangeTheme from '@/utils/change-theme';
 declare const _: any;
 
@@ -72,7 +72,7 @@ export default class IndexPage extends mixins(ChangeTheme) {
 		this.onSearch = await _.debounce(async(event: any) => {
 			const inputEl = event.target as HTMLInputElement;
 			const searchKey = inputEl.value;
-			this.$accessor.pokemon.setListResponse({});
+			this.$accessor.pokemon.setListResponse({} as PokemonListResponse);
 			if (searchKey !== '') {
 				await this.$accessor.pokemon.searchPokemon(searchKey);
 			} else {
@@ -86,6 +86,8 @@ export default class IndexPage extends mixins(ChangeTheme) {
 		if (mainEl && !mainEl.classList.contains('p-5')) {
 			mainEl.classList.add('p-5');
 		}
+
+		this.$accessor.pokemon.setListResponse(this.$accessor.pokemon.listResponse);
 
 		// On page revisit, call fetch again if last fetch is more than 30 sec ago
 		if (this.$fetchState.timestamp <= Date.now() - 30000) {
