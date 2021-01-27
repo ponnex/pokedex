@@ -79,6 +79,9 @@ export const actions = actionTree({ state, getters, mutations }, {
 	async nextPage({ state, dispatch }) {
 		try {
 			const offset = (state.currentPageOffset + 20 < state.count) ? state.currentPageOffset + 20 : Math.ceil(state.count / 20);
+			if (offset >= state.count) {
+				return;
+			}
 			await dispatch('getListResponse', { offset });
 		} catch (err) {
 			throw new Error(err);
@@ -87,6 +90,9 @@ export const actions = actionTree({ state, getters, mutations }, {
 	async prevPage({ state, dispatch }) {
 		try {
 			const offset = (state.currentPageOffset > 20) ? state.currentPageOffset - 20 : 0;
+			if (!offset) {
+				return;
+			}
 			await dispatch('getListResponse', { offset });
 		} catch (err) {
 			throw new Error(err);
