@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="relative inline-grid grid-cols-3 gap-x-4 rounded-2xl min-w-full h-24 text-white dark:text-black shadow-md"
+		class="relative inline-grid grid-cols-3 gap-x-4 rounded-2xl min-w-full h-24 text-white dark:text-black shadow-md cursor-pointer"
 		:class="getBgColor()"
 		@click="event => this.$emit('click', event)"
 	>
@@ -29,7 +29,7 @@
 				:types="pokemonTypes()"
 			/>
 		</div>
-		<span v-if="!$fetchState.pending" class="absolute bottom-0 dark:text-gray-900 font-semibold leading-9 opacity-50 right-0 text-5xl text-white">{{ `#${padStart(pokemonDetails.id, 3, '0')}` }}</span>
+		<span v-if="!$fetchState.pending" class="absolute bottom-0 dark:text-gray-900 font-semibold leading-9 opacity-50 right-0 text-5xl text-white">{{ pokemonDetails ? `#${padStart(pokemonDetails.id, 3, '0')}` : '' }}</span>
 	</div>
 </template>
 

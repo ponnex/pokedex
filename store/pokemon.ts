@@ -6,6 +6,7 @@ import humps from 'lodash-humps';
 import { PokemonSpecies } from '@/model/pokemon-species';
 import { PokemonAbility } from '@/model/pokemon-ability';
 import { PokemonType, DamageRelations } from '@/model/pokemin-type';
+import { PokemonEvolutionChain } from '@/model/pokemon-evolution-chain';
 
 declare const _: any;
 
@@ -18,6 +19,7 @@ export const state = () => ({
 	pokemonType: [] as PokemonType[],
 	count: 0 as number,
 	pokemonDamangeRelation: {} as DamageRelations,
+	pokemonEvolutionChain: {} as PokemonEvolutionChain,
 });
 
 export const getters = getterTree(state, {});
@@ -41,7 +43,7 @@ export const mutations = mutationTree(state, {
 		state.pokemonAbility.push(pokemonAbility);
 		state.pokemonAbility = _.uniqBy(state.pokemonAbility, 'name');
 	},
-	SET_POKEMON_TYPE(state, pokemonType) {
+	SET_POKEMON_TYPE(state, pokemonType: PokemonType) {
 		state.pokemonType.push(pokemonType);
 		state.pokemonType = _.uniqBy(state.pokemonType, 'name');
 	},
@@ -50,6 +52,9 @@ export const mutations = mutationTree(state, {
 	},
 	SET_POKEMON_DAMAGE_RELATION(state, pokemonDamangeRelation: DamageRelations) {
 		state.pokemonDamangeRelation = pokemonDamangeRelation;
+	},
+	SET_POKEMON_EVOLUTION_CHAIN(state, pokemonEvolutionChain: PokemonEvolutionChain) {
+		state.pokemonEvolutionChain = pokemonEvolutionChain;
 	},
 });
 
@@ -74,8 +79,15 @@ export const actions = actionTree({ state, getters, mutations }, {
 			return undefined;
 		}
 	},
-	async getPokemon({ commit }, pokemon: string | number) {
+	async getPokemon({ state, commit }, pokemon: string | number) {
 		try {
+			const isFetched = _.find(state.pokemon, (fetchedPokemon: Pokemon) => {
+				const comparePokemon = typeof pokemon === 'string' ? fetchedPokemon.name : fetchedPokemon.id;
+				return comparePokemon === pokemon;
+			});
+			if (isFetched) {
+				return;
+			}
 			const response = await this.$axios({
 				method: 'get',
 				url: `${ENDPOINTS.POKEMON}/${pokemon}`,
@@ -153,6 +165,22 @@ export const actions = actionTree({ state, getters, mutations }, {
 			}
 			const result = humps(response.data) as PokemonType;
 			commit('SET_POKEMON_TYPE', result);
+			return result;
+		} catch (err) {
+			return undefined;
+		}
+	},
+	async getEvolutionChain({ commit }, chain: number) {
+		try {
+			const response = await this.$axios({
+				method: 'get',
+				url: `${ENDPOINTS.EVOLUTION}/${chain}`,
+			});
+			if (response.status === 404) {
+				return;
+			}
+			const result = humps(response.data) as PokemonEvolutionChain;
+			commit('SET_POKEMON_EVOLUTION_CHAIN', result);
 			return result;
 		} catch (err) {
 			return undefined;

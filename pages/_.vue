@@ -139,8 +139,19 @@
 						:damage-type="'weakness'"
 					/>
 				</section>
-				<section id="evolution" class="details-section min-w-full">
+				<section id="evolution" class="details-section flex flex-col min-w-full">
 					<span class="font-black pb-2 text-xl" :class="`text-${pokemonColor()}`">Evolution</span>
+					<div v-if="evolutionStages.length">
+						<div v-for="(evolutionStage, evolutionStageIdx) in evolutionStages" :key="evolutionStageIdx">
+							<pokemon-evolution-stage
+								:evolution-stage="evolutionStage"
+								:pokemon-color="pokemonColor()"
+							/>
+						</div>
+					</div>
+					<div v-else class="grid flex-grow">
+						<span class="justify-self-center self-center" :class="`text-${pokemonColor()}`">This Pokémon does not evolve.</span>
+					</div>
 				</section>
 			</div>
 		</div>
@@ -153,6 +164,7 @@ import ChangeTheme from '@/utils/change-theme';
 import { Pokemon } from '@/model/pokemon';
 import { FlavorTextEntry, PokemonSpecies } from '@/model/pokemon-species';
 import IdFromUrl from '@/utils/id-from-url';
+import { Chain } from '@/model/pokemon-evolution-chain';
 
 declare const _: any;
 
@@ -162,6 +174,7 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 	padStart: Function = _.padStart;
 	isFetching: boolean = false;
 	activeTab: string = '#about';
+	evolutionStages: any[] = [];
 
 	@Watch('$route', { deep: true, immediate: true })
 	onHashChange(route: any) {
@@ -188,33 +201,53 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 		});
 	}
 
+	get pokemonEvolutionChain() {
+		return this.$accessor.pokemon.pokemonEvolutionChain;
+	}
+
 	get pokemonImage() {
 		return this.pokemon ? this.pokemon.sprites.other.officialArtwork.frontDefault : '';
 	}
 
 	async activated() {
-		if (!this.pokemon) {
-			const { pathMatch } = this.$route.params;
-			this.isFetching = true;
-			await this.$accessor.pokemon.getPokemon(pathMatch);
-			await this.$accessor.pokemon.getPokemonSpecies(pathMatch);
-			this.isFetching = false;
+		this.evolutionStages = [];
+		const { pathMatch } = this.$route.params;
+		this.isFetching = true;
+		await this.getPokemon(pathMatch);
+		await this.$accessor.pokemon.getPokemonSpecies(pathMatch);
+		const { evolutionChain } = this.pokemonSpecies;
+		await this.$accessor.pokemon.getEvolutionChain(parseInt(this.idFromUrl(evolutionChain.url)));
+		this.isFetching = false;
+
+		if (this.pokemonEvolutionChain) {
+			let currentEvolveTo: Chain = this.pokemonEvolutionChain.chain;
+			do {
+				const evolveFrom = currentEvolveTo;
+				const evolveTo = currentEvolveTo.evolvesTo ? currentEvolveTo.evolvesTo[0] : undefined;
+				currentEvolveTo = evolveTo!;
+				if (evolveTo) {
+					this.evolutionStages.push({
+						evolveFrom,
+						evolveTo,
+					});
+				}
+			} while (currentEvolveTo);
 		}
+
 		if (this.$route.hash === '') {
 			window.location.hash = '#about';
-		}
-		const mainEl = document.querySelector('main') as HTMLElement;
-		if (mainEl && mainEl.classList.contains('p-5')) {
-			mainEl.classList.remove('p-5');
 		}
 
 		setTimeout(() => {
 			this.onHashChange(this.$route.hash);
+			setTimeout(() => {
+				window.scrollTo(0, 0);
+			}, 500);
 		}, 250);
+	}
 
-		setTimeout(() => {
-			window.scrollTo(0, 0);
-		}, 500);
+	async getPokemon(pokemon: string | number) {
+		await this.$accessor.pokemon.getPokemon(pokemon);
 	}
 
 	pokemonColor() {
