@@ -1,40 +1,42 @@
 <template>
-	<div class="mt-5">
-		<div v-if="damageType === 'strength'">
+	<div class="my-5">
+		<div v-if="damageType === 'strength'" class="gap-4 grid">
 			<div
 				v-for="(strengths, strengthsIdx) in pokemonDamageRelations.strength"
 				:key="strengthsIdx"
-				class="grid grid-cols-5"
+				class="grid gap-4 grid-cols-5"
 			>
 				<div
 					v-for="(strength, strengthIdx) in strengths"
 					:key="strengthIdx"
+					class="flex flex-col"
 				>
 					<img
-						class="flex p-2 gap-x-1 rounded-full h-10 self-center"
+						class="p-2 gap-x-1 rounded-full h-10 self-center"
 						:src="require(`@/assets/images/types/${strength.name}.svg`)"
 						:class="`${strength.name}`"
 					/>
-					<span>{{ strengthsIdx === 'double' ? '2' : '1/2' }}</span>
+					<span class="self-center">{{ strengthsIdx === 'double' ? '2' : '1/2' }}</span>
 				</div>
 			</div>
 		</div>
-		<div v-else>
+		<div v-else class="gap-4 grid">
 			<div
 				v-for="(weaknesses, weaknessesIdx) in pokemonDamageRelations.weakness"
 				:key="weaknessesIdx"
-				class="grid grid-cols-5"
+				class="grid gap-4 grid-cols-5"
 			>
 				<div
 					v-for="(weakness, weaknessIdx) in weaknesses"
 					:key="weaknessIdx"
+					class="flex flex-col"
 				>
 					<img
-						class="flex p-2 gap-x-1 rounded-full h-10 self-center"
+						class="p-2 gap-x-1 rounded-full h-10 self-center"
 						:src="require(`@/assets/images/types/${weakness.name}.svg`)"
 						:class="`${weakness.name}`"
 					/>
-					<span>{{ weaknessesIdx === 'double' ? '2' : '1/2' }}</span>
+					<span class="self-center">{{ weaknessesIdx === 'double' ? '2' : '1/2' }}</span>
 				</div>
 			</div>
 		</div>
@@ -93,10 +95,10 @@ export default class PokemonAbilityComponent extends mixins(IdFromUrl) {
 			.reduce((accum: DamageRelations, damageRelations: DamageRelations) => {
 				const { doubleDamageFrom, doubleDamageTo, halfDamageFrom, halfDamageTo } = accum as DamageRelations;
 				return {
-					doubleDamageFrom: _.concat(doubleDamageFrom, damageRelations.doubleDamageFrom),
-					doubleDamageTo: _.concat(doubleDamageTo, damageRelations.doubleDamageTo),
-					halfDamageFrom: _.concat(halfDamageFrom, damageRelations.halfDamageFrom),
-					halfDamageTo: _.concat(halfDamageTo, damageRelations.halfDamageTo),
+					doubleDamageFrom: _.uniqBy(_.concat(doubleDamageFrom, damageRelations.doubleDamageFrom), 'name'),
+					doubleDamageTo: _.uniqBy(_.concat(doubleDamageTo, damageRelations.doubleDamageTo), 'name'),
+					halfDamageFrom: _.uniqBy(_.concat(halfDamageFrom, damageRelations.halfDamageFrom), 'name'),
+					halfDamageTo: _.uniqBy(_.concat(halfDamageTo, damageRelations.halfDamageTo), 'name'),
 				};
 			})
 			.value();
