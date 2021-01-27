@@ -151,7 +151,7 @@
 import { Component, mixins, Watch } from 'nuxt-property-decorator';
 import ChangeTheme from '@/utils/change-theme';
 import { Pokemon } from '@/model/pokemon';
-import { PokemonSpecies } from '@/model/pokemon-species';
+import { FlavorTextEntry, PokemonSpecies } from '@/model/pokemon-species';
 import IdFromUrl from '@/utils/id-from-url';
 
 declare const _: any;
@@ -231,7 +231,11 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 	}
 
 	pokemonDescription() {
-		return this.pokemonSpecies ? this.pokemonSpecies.flavorTextEntries[0].flavorText.replace(' ', ' ') : '';
+		return this.pokemonSpecies
+			? _.find(this.pokemonSpecies.flavorTextEntries, (flavorTextEntry: FlavorTextEntry) => {
+				return flavorTextEntry.language.name === 'en';
+			}).flavorText
+			: '';
 	}
 
 	pokemonGrowthRate() {
