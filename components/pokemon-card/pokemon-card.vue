@@ -6,11 +6,10 @@
 	>
 		<svg
 			v-if="$fetchState.pending"
-			class="fill-current h-full p-2 justify-self-center self-center col-span-1"
-			width="100%"
-			height="100%"
-			viewBox="0 0 100 100"
-			preserveAspectRatio="xMidYMid meet"
+			class="fill-current h-full p-3 justify-self-center self-center col-span-1"
+			width="104"
+			height="104"
+			viewBox="0 0 104 104"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
 		>

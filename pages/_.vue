@@ -1,158 +1,167 @@
 <template>
-	<div v-if="pokemon && !isFetching" class="h-screen text-white">
-		<div class="h-56" :class="`bg-${pokemonColor()}`"></div>
-		<div class="details-bg" :class="`bg-${pokemonColor()}`"></div>
-		<div class="absolute flex flex-col h-full p-5 top-0 w-screen space-y-4">
-			<div class="grid grid-cols-12 fill-current text-white dark:text-gray-900">
-				<svg
-					width="22"
-					height="14"
-					viewBox="0 0 22 14"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
-					class="col-span-11 cursor-pointer"
-					@click="onHome()"
-				>
-					<path
-						d="M7.70711 1.70711C8.09763 1.31658 8.09763 0.683417 7.70711 0.292893C7.31658 -0.0976311 6.68342 -0.0976311 6.29289 0.292893L0.292893 6.29289C-0.097631 6.68342 -0.097631 7.31658 0.292893 7.70711L6.29289 13.7071C6.68342 14.0976 7.31658 14.0976 7.70711 13.7071C8.09763 13.3166 8.09763 12.6834 7.70711 12.2929L3.4142 7.99998H20.9892C21.5476 7.99998 22.0002 7.55227 22.0002 6.99998C22.0002 6.4477 21.5476 5.99998 20.9892 5.99998H3.41423L7.70711 1.70711Z"
-						fill="currentColor"
-					/>
-				</svg>
-				<svg
-					fill="none"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					stroke-width="2"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-					class="w-6 h-6 col-span-1 justify-self-end self-center cursor-pointer"
-					@click="onChangeTheme()"
-				>
-					<path v-if="$colorMode.preference == 'light'" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-					<path v-if="$colorMode.preference == 'dark'" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-				</svg>
-			</div>
-			<div class="flex flex-col leading-none">
-				<div class="inline-grid grid-cols-3">
-					<span class="col-span-2 font-bold text-3xl">{{ pokemon ? startCase(pokemon.name) : '' }}</span>
-					<span class="col-span-1 text-white dark:text-gray-900 opacity-75 font-bold justify-self-end self-center text-4xl">{{ pokemon ? `#${padStart(pokemon.id, 3, '0')}`: '' }}</span>
+	<div class="flex flex-col h-screen text-white">
+		<!-- <div v-if="pokemon && !isFetching"> -->
+		<div v-if="pokemon && !isFetching">
+			<div class="h-56" :class="`bg-${pokemonColor()}`"></div>
+			<div class="details-bg" :class="`bg-${pokemonColor()}`"></div>
+			<div class="absolute flex flex-col h-full p-5 top-0 w-screen space-y-4">
+				<div class="grid grid-cols-12 fill-current text-white dark:text-gray-900">
+					<svg
+						width="22"
+						height="14"
+						viewBox="0 0 22 14"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+						class="col-span-11 cursor-pointer"
+						@click="onHome()"
+					>
+						<path
+							d="M7.70711 1.70711C8.09763 1.31658 8.09763 0.683417 7.70711 0.292893C7.31658 -0.0976311 6.68342 -0.0976311 6.29289 0.292893L0.292893 6.29289C-0.097631 6.68342 -0.097631 7.31658 0.292893 7.70711L6.29289 13.7071C6.68342 14.0976 7.31658 14.0976 7.70711 13.7071C8.09763 13.3166 8.09763 12.6834 7.70711 12.2929L3.4142 7.99998H20.9892C21.5476 7.99998 22.0002 7.55227 22.0002 6.99998C22.0002 6.4477 21.5476 5.99998 20.9892 5.99998H3.41423L7.70711 1.70711Z"
+							fill="currentColor"
+						/>
+					</svg>
+					<svg
+						fill="none"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						class="w-6 h-6 col-span-1 justify-self-end self-center cursor-pointer"
+						@click="onChangeTheme()"
+					>
+						<path v-if="$colorMode.preference == 'light'" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+						<path v-if="$colorMode.preference == 'dark'" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+					</svg>
 				</div>
-				<pokemon-type-badge
-					:types="pokemon ? pokemon.types : []"
-				/>
-				<img
-					:src="pokemonImage"
-					:alt="pokemon ? pokemon.name: ''"
-					class="h-36 w-36 justify-self-center self-center"
-				>
-			</div>
-			<div class="flex font-medium justify-center pt-3 space-x-8 text-sm">
-				<a
-					href="#about"
-					class="px-3 py-0.5 rounded shadow"
-					:class="isActiveTab('#about')"
-				>
-					About
-				</a>
-				<a
-					href="#stats"
-					class="px-3 py-0.5 rounded shadow"
-					:class="isActiveTab('#stats')"
-				>
-					Stats
-				</a>
-				<a
-					href="#evolution"
-					class="px-3 py-0.5 rounded shadow"
-					:class="isActiveTab('#evolution')"
-				>
-					Evolution
-				</a>
-			</div>
-			<div class="details-container no-scrollbar text-gray-700 dark:text-white flex overflow-x-scroll overflow-y-hidden w-full">
-				<section id="about" class="details-section flex-grow flex flex-col min-w-full space-y-5">
-					<div class="flex flex-col items-center justify-center">
-						<span class="break-words text-justify text-sm">{{ pokemonDescription() }}</span>
+				<div class="flex flex-col leading-none">
+					<div class="inline-grid grid-cols-3">
+						<span class="col-span-2 font-bold text-3xl">{{ pokemon ? startCase(pokemon.name) : '' }}</span>
+						<span class="col-span-1 text-white dark:text-gray-900 opacity-75 font-bold justify-self-end self-center text-4xl">{{ pokemon ? `#${padStart(pokemon.id, 3, '0')}`: '' }}</span>
 					</div>
 					<pokemon-type-badge
 						:types="pokemon ? pokemon.types : []"
-						:full="true"
 					/>
-					<span class="font-black pt-2 pb-2 text-xl" :class="`text-${pokemonColor()}`">Pokédex Data</span>
-					<div class="grid grid-cols-2 gap-4 mt-2 font-black text-xs">
-						<div class="grid grid-cols-2">
-							<span class="col-span-1 text-gray-700 dark:text-white">Height</span>
-							<span class="col-span-1" :class="`text-${pokemonColor()}`">{{ pokemon ? (pokemon.height / 10) : '' }} m</span>
+					<img
+						:src="pokemonImage"
+						:alt="pokemon ? pokemon.name: ''"
+						class="h-36 w-36 justify-self-center self-center"
+					>
+				</div>
+				<div class="flex font-medium justify-center pt-3 space-x-8 text-sm">
+					<a
+						href="#about"
+						class="px-3 py-0.5 rounded shadow"
+						:class="isActiveTab('#about')"
+					>
+						About
+					</a>
+					<a
+						href="#stats"
+						class="px-3 py-0.5 rounded shadow"
+						:class="isActiveTab('#stats')"
+					>
+						Stats
+					</a>
+					<a
+						href="#evolution"
+						class="px-3 py-0.5 rounded shadow"
+						:class="isActiveTab('#evolution')"
+					>
+						Evolution
+					</a>
+				</div>
+				<div class="details-container no-scrollbar text-gray-700 dark:text-white flex overflow-x-scroll overflow-y-hidden w-full">
+					<section id="about" class="details-section flex-grow flex flex-col min-w-full space-y-5">
+						<div class="flex flex-col items-center justify-center">
+							<span class="break-words text-justify text-sm">{{ pokemonDescription() }}</span>
 						</div>
-						<div class="grid grid-cols-2">
-							<span class="col-span-1 text-gray-700 dark:text-white">Weight</span>
-							<span class="col-span-1" :class="`text-${pokemonColor()}`">{{ pokemon ? (pokemon.weight / 10) : '' }} kg</span>
+						<pokemon-type-badge
+							:types="pokemon ? pokemon.types : []"
+							:full="true"
+						/>
+						<span class="font-black pt-2 pb-2 text-xl" :class="`text-${pokemonColor()}`">Pokédex Data</span>
+						<div class="grid grid-cols-2 gap-4 mt-2 font-black text-xs">
+							<div class="grid grid-cols-2">
+								<span class="col-span-1 text-gray-700 dark:text-white">Height</span>
+								<span class="col-span-1" :class="`text-${pokemonColor()}`">{{ pokemon ? (pokemon.height / 10) : '' }} m</span>
+							</div>
+							<div class="grid grid-cols-2">
+								<span class="col-span-1 text-gray-700 dark:text-white">Weight</span>
+								<span class="col-span-1" :class="`text-${pokemonColor()}`">{{ pokemon ? (pokemon.weight / 10) : '' }} kg</span>
+							</div>
+							<div class="grid grid-cols-2">
+								<span class="col-span-1 text-gray-700 dark:text-white">Gender</span>
+								<span class="col-span-1" :class="`text-${pokemonColor()}`">{{ pokemonGender() }}</span>
+							</div>
+							<div class="grid grid-cols-2">
+								<span class="col-span-1 text-gray-700 dark:text-white">Growth Rate</span>
+								<span class="col-span-1" :class="`text-${pokemonColor()}`">{{ pokemonGrowthRate() }}</span>
+							</div>
+							<div class="grid grid-cols-2">
+								<span class="col-span-1 text-gray-700 dark:text-white">Base Exp</span>
+								<span class="col-span-1" :class="`text-${pokemonColor()}`">{{ pokemon ? pokemon.baseExperience : '' }}</span>
+							</div>
+							<div class="grid grid-cols-2">
+								<span class="col-span-1 text-gray-700 dark:text-white">Rarity</span>
+								<span class="col-span-1" :class="`text-${pokemonColor()}`">{{ pokemonRarity() }}</span>
+							</div>
 						</div>
-						<div class="grid grid-cols-2">
-							<span class="col-span-1 text-gray-700 dark:text-white">Gender</span>
-							<span class="col-span-1" :class="`text-${pokemonColor()}`">{{ pokemonGender() }}</span>
+						<span class="font-black pt-2 text-xl" :class="`text-${pokemonColor()}`">Abilities</span>
+						<div v-for="(ability, abilityIdx) in pokemon.abilities" :key="abilityIdx" class="grid grid-cols-3 font-black text-xs">
+							<span class="leading-none col-span-1 text-gray-700 dark:text-white text-xs">{{ startCase(ability.ability.name) }}</span>
+							<pokemon-ability class="col-span-2" :ability="ability.ability.url" />
 						</div>
-						<div class="grid grid-cols-2">
-							<span class="col-span-1 text-gray-700 dark:text-white">Growth Rate</span>
-							<span class="col-span-1" :class="`text-${pokemonColor()}`">{{ pokemonGrowthRate() }}</span>
+						<span class="font-black pt-2 text-xl" :class="`text-${pokemonColor()}`">Moves</span>
+						<div class="grid grid-cols-5 font-black text-xs gap-0.5">
+							<span v-for="(move, moveIdx) in pokemon.moves" :key="moveIdx" class="moves-name leading-none text-gray-700 dark:text-white text-sm">{{ startCase(move.move.name) }}</span>
 						</div>
-						<div class="grid grid-cols-2">
-							<span class="col-span-1 text-gray-700 dark:text-white">Base Exp</span>
-							<span class="col-span-1" :class="`text-${pokemonColor()}`">{{ pokemon ? pokemon.baseExperience : '' }}</span>
+					</section>
+					<section id="stats" class="details-section flex-grow min-w-full">
+						<span class="font-black pb-2 text-xl" :class="`text-${pokemonColor()}`">Base Stats</span>
+						<div class="grid grid-rows-6 gap-4 my-5 text-xs">
+							<div v-for="(stats, statsIdx) in pokemon.stats" :key="statsIdx" class="grid grid-cols-12">
+								<span class="col-span-4 font-black text-gray-700 dark:text-white">{{ stats.stat.name !== 'hp' ? startCase(stats.stat.name) : 'HP' }}</span>
+								<span class="col-span-1 text-gray-700 dark:text-white">{{ stats.baseStat }}</span>
+								<pokemon-stats-bar
+									:stat="stats.baseStat"
+									:bar-color="pokemonColor()"
+									class="col-span-7"
+								/>
+							</div>
 						</div>
-						<div class="grid grid-cols-2">
-							<span class="col-span-1 text-gray-700 dark:text-white">Rarity</span>
-							<span class="col-span-1" :class="`text-${pokemonColor()}`">{{ pokemonRarity() }}</span>
+						<span class="font-black text-xl" :class="`text-${pokemonColor()}`">Strength</span>
+						<pokemon-damage-relation
+							:types="pokemon.types"
+							:damage-type="'strength'"
+						/>
+						<span class="font-black text-xl" :class="`text-${pokemonColor()}`">Weakness</span>
+						<pokemon-damage-relation
+							:types="pokemon.types"
+							:damage-type="'weakness'"
+						/>
+					</section>
+					<section id="evolution" class="details-section flex-grow flex flex-col min-w-full">
+						<span class="font-black pb-2 text-xl" :class="`text-${pokemonColor()}`">Evolution</span>
+						<div v-if="evolutionStages.length">
+							<div v-for="(evolutionStage, evolutionStageIdx) in evolutionStages" :key="evolutionStageIdx">
+								<pokemon-evolution-stage
+									:evolution-stage="evolutionStage"
+									:pokemon-color="pokemonColor()"
+								/>
+							</div>
 						</div>
-					</div>
-					<span class="font-black pt-2 text-xl" :class="`text-${pokemonColor()}`">Abilities</span>
-					<div v-for="(ability, abilityIdx) in pokemon.abilities" :key="abilityIdx" class="grid grid-cols-3 font-black text-xs">
-						<span class="leading-none col-span-1 text-gray-700 dark:text-white text-xs">{{ startCase(ability.ability.name) }}</span>
-						<pokemon-ability class="col-span-2" :ability="ability.ability.url" />
-					</div>
-					<span class="font-black pt-2 text-xl" :class="`text-${pokemonColor()}`">Moves</span>
-					<div class="grid grid-cols-5 font-black text-xs gap-0.5">
-						<span v-for="(move, moveIdx) in pokemon.moves" :key="moveIdx" class="moves-name leading-none text-gray-700 dark:text-white text-sm">{{ startCase(move.move.name) }}</span>
-					</div>
-				</section>
-				<section id="stats" class="details-section flex-grow min-w-full">
-					<span class="font-black pb-2 text-xl" :class="`text-${pokemonColor()}`">Base Stats</span>
-					<div class="grid grid-rows-6 gap-4 my-5 text-xs">
-						<div v-for="(stats, statsIdx) in pokemon.stats" :key="statsIdx" class="grid grid-cols-12">
-							<span class="col-span-4 font-black text-gray-700 dark:text-white">{{ stats.stat.name !== 'hp' ? startCase(stats.stat.name) : 'HP' }}</span>
-							<span class="col-span-1 text-gray-700 dark:text-white">{{ stats.baseStat }}</span>
-							<pokemon-stats-bar
-								:stat="stats.baseStat"
-								:bar-color="pokemonColor()"
-								class="col-span-7"
-							/>
+						<div v-else class="grid flex-grow">
+							<span class="justify-self-center self-center" :class="`text-${pokemonColor()}`">This Pokémon does not evolve.</span>
 						</div>
-					</div>
-					<span class="font-black text-xl" :class="`text-${pokemonColor()}`">Strength</span>
-					<pokemon-damage-relation
-						:types="pokemon.types"
-						:damage-type="'strength'"
-					/>
-					<span class="font-black text-xl" :class="`text-${pokemonColor()}`">Weakness</span>
-					<pokemon-damage-relation
-						:types="pokemon.types"
-						:damage-type="'weakness'"
-					/>
-				</section>
-				<section id="evolution" class="details-section flex-grow flex flex-col min-w-full">
-					<span class="font-black pb-2 text-xl" :class="`text-${pokemonColor()}`">Evolution</span>
-					<div v-if="evolutionStages.length">
-						<div v-for="(evolutionStage, evolutionStageIdx) in evolutionStages" :key="evolutionStageIdx">
-							<pokemon-evolution-stage
-								:evolution-stage="evolutionStage"
-								:pokemon-color="pokemonColor()"
-							/>
-						</div>
-					</div>
-					<div v-else class="grid flex-grow">
-						<span class="justify-self-center self-center" :class="`text-${pokemonColor()}`">This Pokémon does not evolve.</span>
-					</div>
-				</section>
+					</section>
+				</div>
+			</div>
+		</div>
+		<div v-else class="grid flex-grow justify-self-center self-center">
+			<div class="grid justify-self-center self-center">
+				<img src="@/assets/images/pokeball_loading.gif" alt="pokeball_loading" class="h-32 justify-self-center self-center">
+				<span class="justify-self-center self-center">Loading...</span>
 			</div>
 		</div>
 	</div>
@@ -215,23 +224,29 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 		this.isFetching = true;
 		await this.getPokemon(pathMatch);
 		await this.$accessor.pokemon.getPokemonSpecies(pathMatch);
-		const { evolutionChain } = this.pokemonSpecies;
-		await this.$accessor.pokemon.getEvolutionChain(parseInt(this.idFromUrl(evolutionChain.url)));
 		this.isFetching = false;
 
-		if (this.pokemonEvolutionChain) {
-			let currentEvolveTo: Chain = this.pokemonEvolutionChain.chain;
-			do {
-				const evolveFrom = currentEvolveTo;
-				const evolveTo = currentEvolveTo.evolvesTo ? currentEvolveTo.evolvesTo[0] : undefined;
-				currentEvolveTo = evolveTo!;
-				if (evolveTo) {
-					this.evolutionStages.push({
-						evolveFrom,
-						evolveTo,
-					});
-				}
-			} while (currentEvolveTo);
+		if (this.pokemonSpecies) {
+			const { evolutionChain } = this.pokemonSpecies;
+
+			this.isFetching = true;
+			await this.$accessor.pokemon.getEvolutionChain(parseInt(this.idFromUrl(evolutionChain.url)));
+			this.isFetching = false;
+
+			if (this.pokemonEvolutionChain) {
+				let currentEvolveTo: Chain = this.pokemonEvolutionChain.chain;
+				do {
+					const evolveFrom = currentEvolveTo;
+					const evolveTo = currentEvolveTo.evolvesTo ? currentEvolveTo.evolvesTo[0] : undefined;
+					currentEvolveTo = evolveTo!;
+					if (evolveTo) {
+						this.evolutionStages.push({
+							evolveFrom,
+							evolveTo,
+						});
+					}
+				} while (currentEvolveTo);
+			}
 		}
 
 		if (this.$route.hash === '') {
@@ -272,12 +287,12 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 	}
 
 	pokemonGrowthRate() {
-		return this.pokemonSpecies ? this.startCase(this.pokemonSpecies.growthRate.name) : '';
+		return this.pokemonSpecies ? this.startCase(this.pokemonSpecies.growthRate.name) : 'Unknown';
 	}
 
 	pokemonRarity() {
 		if (!this.pokemonSpecies) {
-			return;
+			return 'Unknown';
 		}
 		if (this.pokemonSpecies.isLegendary) {
 			return 'Legendary';
@@ -290,7 +305,7 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 
 	pokemonGender() {
 		if (!this.pokemonSpecies) {
-			return;
+			return 'Unknown';
 		}
 		if (this.pokemonSpecies.genderRate !== -1) {
 			return 'Male / Female';
