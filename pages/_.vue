@@ -211,6 +211,10 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 		setTimeout(() => {
 			this.onHashChange(this.$route.hash);
 		}, 250);
+
+		setTimeout(() => {
+			window.scrollTo(0, 0);
+		}, 250);
 	}
 
 	pokemonColor() {
