@@ -70,7 +70,7 @@
 				</a>
 			</div>
 			<div class="details-container no-scrollbar text-gray-700 dark:text-white flex overflow-x-scroll overflow-y-hidden w-full">
-				<section id="about" class="details-section flex flex-col min-w-full space-y-5">
+				<section id="about" class="details-section flex-grow flex flex-col min-w-full space-y-5">
 					<div class="flex flex-col items-center justify-center">
 						<span class="break-words text-justify text-sm">{{ pokemonDescription() }}</span>
 					</div>
@@ -115,7 +115,7 @@
 						<span v-for="(move, moveIdx) in pokemon.moves" :key="moveIdx" class="moves-name leading-none text-gray-700 dark:text-white text-sm">{{ startCase(move.move.name) }}</span>
 					</div>
 				</section>
-				<section id="stats" class="details-section min-w-full">
+				<section id="stats" class="details-section flex-grow min-w-full">
 					<span class="font-black pb-2 text-xl" :class="`text-${pokemonColor()}`">Base Stats</span>
 					<div class="grid grid-rows-6 gap-4 my-5 text-xs">
 						<div v-for="(stats, statsIdx) in pokemon.stats" :key="statsIdx" class="grid grid-cols-12">
@@ -139,7 +139,7 @@
 						:damage-type="'weakness'"
 					/>
 				</section>
-				<section id="evolution" class="details-section flex flex-col min-w-full">
+				<section id="evolution" class="details-section flex-grow flex flex-col min-w-full">
 					<span class="font-black pb-2 text-xl" :class="`text-${pokemonColor()}`">Evolution</span>
 					<div v-if="evolutionStages.length">
 						<div v-for="(evolutionStage, evolutionStageIdx) in evolutionStages" :key="evolutionStageIdx">

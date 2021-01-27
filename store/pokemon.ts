@@ -80,6 +80,7 @@ export const actions = actionTree({ state, getters, mutations }, {
 		}
 	},
 	async getPokemon({ state, commit }, pokemon: string | number) {
+		let result;
 		try {
 			const isFetched = _.find(state.pokemon, (fetchedPokemon: Pokemon) => {
 				const comparePokemon = typeof pokemon === 'string' ? fetchedPokemon.name : fetchedPokemon.id;
@@ -92,15 +93,15 @@ export const actions = actionTree({ state, getters, mutations }, {
 				method: 'get',
 				url: `${ENDPOINTS.POKEMON}/${pokemon}`,
 			});
-			const result = humps(response.data) as Pokemon;
+			result = humps(response.data) as Pokemon;
 			commit('SET_POKEMON', result);
-			return result;
 		} catch (err) {
-			return undefined;
+			return;
 		}
+		return result;
 	},
 	async searchPokemon({ state, commit }, pokemon: string) {
-		// @TODO: use lodash chuck for Result[] and pagination on search
+		let result;
 		try {
 			const response = await this.$axios({
 				method: 'get',
@@ -116,13 +117,15 @@ export const actions = actionTree({ state, getters, mutations }, {
 			const pokemonSearch = _.filter(pokemonResults, (pokemonResult: PokemonList) => {
 				return regex.test(pokemonResult.name);
 			});
-			const listResponse = { results: pokemonSearch, count: pokemonSearch.length, ...list };
-			commit('SET_LIST_RESPONSE', listResponse);
+			result = { results: pokemonSearch, count: pokemonSearch.length, ...list };
+			commit('SET_LIST_RESPONSE', result);
 		} catch (err) {
-			return undefined;
+			return;
 		}
+		return result;
 	},
 	async getPokemonSpecies({ commit }, pokemon: string | number) {
+		let result;
 		try {
 			const response = await this.$axios({
 				method: 'get',
@@ -131,14 +134,15 @@ export const actions = actionTree({ state, getters, mutations }, {
 			if (response.status === 404) {
 				return;
 			}
-			const result = humps(response.data) as PokemonSpecies;
+			result = humps(response.data) as PokemonSpecies;
 			commit('SET_POKEMON_SPECIES', result);
-			return result;
 		} catch (err) {
-			return undefined;
+			return;
 		}
+		return result;
 	},
 	async getPokemonAbility({ commit }, ability: string | number) {
+		let result;
 		try {
 			const response = await this.$axios({
 				method: 'get',
@@ -147,12 +151,12 @@ export const actions = actionTree({ state, getters, mutations }, {
 			if (response.status === 404) {
 				return;
 			}
-			const result = humps(response.data) as PokemonAbility;
+			result = humps(response.data) as PokemonAbility;
 			commit('SET_POKEMON_ABILITY', result);
-			return result;
 		} catch (err) {
-			return undefined;
+			return;
 		}
+		return result;
 	},
 	async getPokemonType({ commit }, type: string | number) {
 		try {
@@ -171,6 +175,7 @@ export const actions = actionTree({ state, getters, mutations }, {
 		}
 	},
 	async getEvolutionChain({ commit }, chain: number) {
+		let result;
 		try {
 			const response = await this.$axios({
 				method: 'get',
@@ -179,11 +184,11 @@ export const actions = actionTree({ state, getters, mutations }, {
 			if (response.status === 404) {
 				return;
 			}
-			const result = humps(response.data) as PokemonEvolutionChain;
+			result = humps(response.data) as PokemonEvolutionChain;
 			commit('SET_POKEMON_EVOLUTION_CHAIN', result);
-			return result;
 		} catch (err) {
-			return undefined;
+			return;
 		}
+		return result;
 	},
 });

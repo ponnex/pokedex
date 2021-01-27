@@ -86,11 +86,6 @@ export default class IndexPage extends mixins(ChangeTheme) {
 
 	activated() {
 		this.$accessor.pokemon.setListResponse(this.$accessor.pokemon.listResponse);
-
-		// On page revisit, call fetch again if last fetch is more than 30 sec ago
-		if (this.$fetchState.timestamp <= Date.now() - 30000) {
-			this.$fetch();
-		}
 	}
 
 	onSelectPokemon(pokemon: PokemonList) {
