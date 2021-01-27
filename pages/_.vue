@@ -161,7 +161,7 @@
 		<div v-else class="grid flex-grow justify-self-center self-center">
 			<div class="grid justify-self-center self-center">
 				<img src="@/assets/images/pokeball_loading.gif" alt="pokeball_loading" class="h-32 justify-self-center self-center">
-				<span class="justify-self-center self-center">Loading...</span>
+				<span class="justify-self-center self-center text-gray-500 dark:text-white">Loading...</span>
 			</div>
 		</div>
 	</div>

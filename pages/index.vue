@@ -34,7 +34,7 @@
 		<div v-if="isLoadingList" class="flex flex-grow justify-self-center self-center">
 			<div class="grid justify-self-center self-center">
 				<img src="@/assets/images/pokeball_loading.gif" alt="pokeball_loading" class="h-32 justify-self-center self-center">
-				<span class="justify-self-center self-center">Loading...</span>
+				<span class="justify-self-center self-center text-gray-500 dark:text-white">Loading...</span>
 			</div>
 		</div>
 		<div v-else class="flex-grow py-4 space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-4 sm:items-center">
