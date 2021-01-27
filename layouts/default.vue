@@ -1,5 +1,5 @@
 <template>
-	<main class="h-screen p-5">
+	<main class="p-5">
 		<Nuxt keep-alive />
 	</main>
 </template>
