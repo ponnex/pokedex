@@ -163,12 +163,14 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 	isFetching: boolean = false;
 	activeTab: string = '#about';
 
-	@Watch('$route.hash', { deep: true, immediate: true })
-	onHashChange(hash: string) {
-		if (hash !== '' && hash) {
-			this.activeTab = hash;
-			document.querySelector(`a[href='${hash}']`)?.scrollIntoView();
-			document.querySelector(`${hash}`)?.scrollIntoView();
+	@Watch('$route', { deep: true, immediate: true })
+	onHashChange(route: any) {
+		if (route.hash !== '' && route.hash) {
+			this.activeTab = route.hash;
+			setTimeout(() => {
+				document.querySelector(`a[href='${route.hash}']`)?.scrollIntoView();
+				document.querySelector(`${route.hash}`)?.scrollIntoView();
+			}, 250);
 		}
 	}
 
