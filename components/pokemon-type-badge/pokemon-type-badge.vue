@@ -1,12 +1,21 @@
 <template>
-	<div class="inline-block space-x-2">
-		<span v-for="(type, typeIdx) in types" :key="typeIdx">{{ type.type.name }}</span>
+	<div v-if="types" class="flex space-x-2 mt-2">
+		<div
+			v-for="(type, typeIdx) in types"
+			:key="typeIdx"
+			class="flex p-1 gap-x-1"
+			:class="[`${type.type.name}`, {'rounded': full}, {'rounded-xl': !full}]"
+		>
+			<img class="h-3 self-center" :src="require(`@/assets/images/types/${type.type.name}.svg`)" />
+			<span v-if="full" class="type-name font-bold text-white">{{ upperCase(type.type.name) }}</span>
+		</div>
 	</div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'nuxt-property-decorator';
 import { Type } from '@/model/pokemon';
+declare const _: any;
 
 @Component
 export default class PokemonTypeBadge extends Vue {
@@ -19,5 +28,13 @@ export default class PokemonTypeBadge extends Vue {
 		type: Boolean,
 		default: false,
 	}) full!: Boolean;
+
+	upperCase: Function = _.upperCase;
 }
 </script>
+
+<style lang="scss" scoped>
+.type-name {
+	font-size: 8px;
+}
+</style>

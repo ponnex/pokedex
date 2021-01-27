@@ -1,4 +1,4 @@
-# pokedex
+# Pokédex
 
 # References
 - https://pokeapi.co/docs/v2

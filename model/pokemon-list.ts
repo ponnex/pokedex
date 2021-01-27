@@ -1,15 +1,10 @@
-import { Type } from './pokemon';
-export interface Result {
+export interface PokemonList {
   name: string;
   url: string;
-  image?: string | null;
-  id?: number;
-  types?: Type[];
-  color?: string;
 }
-export interface PokemonList {
+export interface PokemonListResponse {
   count: number;
   next: string;
   previous?: any;
-  results: Result[];
+  results: PokemonList[];
 }

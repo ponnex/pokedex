@@ -1,91 +1,93 @@
 import { getterTree, mutationTree, actionTree } from 'nuxt-typed-vuex';
-import { PokemonList, Result } from '@/model/pokemon-list';
+import { PokemonListResponse, PokemonList } from '@/model/pokemon-list';
 import { Pokemon } from '@/model/pokemon';
 import { ENDPOINTS } from '@/model/constants';
 import humps from 'lodash-humps';
 import { PokemonSpecies } from '@/model/pokemon-species';
+import { PokemonAbility } from '@/model/pokemon-ability';
+import { PokemonType, DamageRelations } from '@/model/pokemin-type';
 
 declare const _: any;
 
 export const state = () => ({
-	pokemon: {} as Pokemon,
-	listing: {} as PokemonList,
+	pokemon: [] as Pokemon[],
+	pokemonList: [] as PokemonList[],
+	pokemonSpecies: [] as PokemonSpecies[],
+	listResponse: {} as PokemonListResponse,
+	pokemonAbility: [] as PokemonAbility[],
+	pokemonType: [] as PokemonType[],
 	count: 0 as number,
+	pokemonDamangeRelation: {} as DamageRelations,
 });
 
 export const getters = getterTree(state, {});
 
 export const mutations = mutationTree(state, {
-	SET_LISTING(state, listing: PokemonList) {
-		state.listing = listing;
+	SET_LIST_RESPONSE(state, listResponse: PokemonListResponse) {
+		state.listResponse = listResponse;
 	},
-	GET_POKEMON(state, pokemon: Pokemon) {
-		state.pokemon = pokemon;
+	SET_POKEMON_LIST(state, pokemonList: PokemonList[]) {
+		state.pokemonList = _.uniqBy(_.concat(state.pokemonList, pokemonList), 'name');
+	},
+	SET_POKEMON(state, pokemon: Pokemon) {
+		state.pokemon.push(pokemon);
+		state.pokemon = _.uniqBy(state.pokemon, 'name');
+	},
+	SET_POKEMON_SPECIES(state, pokemonSpecies: PokemonSpecies) {
+		state.pokemonSpecies.push(pokemonSpecies);
+		state.pokemonSpecies = _.uniqBy(state.pokemonSpecies, 'name');
+	},
+	SET_POKEMON_ABILITY(state, pokemonAbility: PokemonAbility) {
+		state.pokemonAbility.push(pokemonAbility);
+		state.pokemonAbility = _.uniqBy(state.pokemonAbility, 'name');
+	},
+	SET_POKEMON_TYPE(state, pokemonType) {
+		state.pokemonType.push(pokemonType);
+		state.pokemonType = _.uniqBy(state.pokemonType, 'name');
 	},
 	SET_COUNT(state, count: number) {
 		state.count = count;
 	},
+	SET_POKEMON_DAMAGE_RELATION(state, pokemonDamangeRelation: DamageRelations) {
+		state.pokemonDamangeRelation = pokemonDamangeRelation;
+	},
 });
 
 export const actions = actionTree({ state, getters, mutations }, {
-	setListing({ commit }, listing: PokemonList) {
-		commit('SET_LISTING', listing);
+	setListResponse({ commit }) {
+		commit('SET_LIST_RESPONSE', {} as PokemonListResponse);
 	},
-	async getListing({ state, commit }) {
+	setPokemonDamageRelations({ commit }, pokemonDamangeRelation: DamageRelations) {
+		commit('SET_POKEMON_DAMAGE_RELATION', pokemonDamangeRelation);
+	},
+	async getListResponse({ commit }) {
 		try {
 			const response = await this.$axios({
 				method: 'get',
 				url: `${ENDPOINTS.POKEMON}`,
 			});
-			const result = humps(response.data) as PokemonList;
-			commit('SET_LISTING', result);
+			const result = humps(response.data) as PokemonListResponse;
+			commit('SET_LIST_RESPONSE', result);
 			commit('SET_COUNT', result.count);
 			return;
 		} catch (err) {
-			commit('SET_LISTING', state.listing);
-			commit('SET_COUNT', state.count);
+			return undefined;
 		}
 	},
-	async getPokemon({ state, commit }, pokemon: string | number) {
+	async getPokemon({ commit }, pokemon: string | number) {
 		try {
 			const response = await this.$axios({
 				method: 'get',
 				url: `${ENDPOINTS.POKEMON}/${pokemon}`,
 			});
 			const result = humps(response.data) as Pokemon;
-			commit('GET_POKEMON', result);
+			commit('SET_POKEMON', result);
 			return result;
 		} catch (err) {
-			commit('GET_POKEMON', state.pokemon);
+			return undefined;
 		}
 	},
-	async getPokemonImagesForListing({ state, commit, dispatch }, listing?: PokemonList) {
-		try {
-			const { results, ...list } = _.cloneDeep(listing || state.listing) as PokemonList;
-			for (const pokemonResult of results) {
-				const response = await this.$axios({
-					method: 'get',
-					url: `${ENDPOINTS.POKEMON}/${pokemonResult.name}`,
-				});
-				const pokemon = humps(response.data) as Pokemon;
-				const currPokemon: Result = _.find(results, (pokemonResult: Result) => {
-					return pokemon.name === pokemonResult.name;
-				});
-				const pokemonSpecies = await dispatch('getPokemonSpecies', pokemon.name) as PokemonSpecies;
-				currPokemon.image = pokemon.sprites.other.officialArtwork.frontDefault ? pokemon.sprites.other.officialArtwork.frontDefault : pokemon.sprites.other.dreamWorld.frontDefault;
-				currPokemon.id = pokemon.id;
-				currPokemon.types = pokemon.types;
-				if (pokemonSpecies) {
-					currPokemon.color = pokemonSpecies.color.name;
-				}
-			}
-			commit('SET_LISTING', { results, ...list });
-			return;
-		} catch (err) {
-			commit('SET_LISTING', state.listing);
-		}
-	},
-	async searchPokemon({ state, commit, dispatch }, pokemon: string) {
+	async searchPokemon({ state, commit }, pokemon: string) {
 		// @TODO: use lodash chuck for Result[] and pagination on search
 		try {
 			const response = await this.$axios({
@@ -96,20 +98,19 @@ export const actions = actionTree({ state, getters, mutations }, {
 				url: `${ENDPOINTS.POKEMON}`,
 			});
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			const { results, count, ...list } = humps(response.data) as PokemonList;
-			const pokemonResults = results as Result[];
+			const { results, count, ...list } = humps(response.data) as PokemonListResponse;
+			const pokemonResults = results as PokemonList[];
 			const regex = new RegExp(pokemon.toString(), 'i');
-			const pokemonSearch = _.filter(pokemonResults, (pokemonResult: Result) => {
+			const pokemonSearch = _.filter(pokemonResults, (pokemonResult: PokemonList) => {
 				return regex.test(pokemonResult.name);
 			});
-			const newListing = { results: pokemonSearch, count: pokemonSearch.length, ...list };
-			commit('SET_LISTING', newListing);
-			await dispatch('getPokemonImagesForListing', newListing);
+			const listResponse = { results: pokemonSearch, count: pokemonSearch.length, ...list };
+			commit('SET_LIST_RESPONSE', listResponse);
 		} catch (err) {
-			throw new Error(err);
+			return undefined;
 		}
 	},
-	async getPokemonSpecies({ state, commit }, pokemon: string | number) {
+	async getPokemonSpecies({ commit }, pokemon: string | number) {
 		try {
 			const response = await this.$axios({
 				method: 'get',
@@ -118,13 +119,43 @@ export const actions = actionTree({ state, getters, mutations }, {
 			if (response.status === 404) {
 				return;
 			}
-			const pokemonSpecies = humps(response.data) as PokemonSpecies;
-			const statePokemon = _.cloneDeep(state.pokemon) as Pokemon;
-			statePokemon.pokemonSpecies = pokemonSpecies;
-			commit('GET_POKEMON', statePokemon);
-			return pokemonSpecies;
+			const result = humps(response.data) as PokemonSpecies;
+			commit('SET_POKEMON_SPECIES', result);
+			return result;
 		} catch (err) {
-			commit('GET_POKEMON', state.pokemon);
+			return undefined;
+		}
+	},
+	async getPokemonAbility({ commit }, ability: string | number) {
+		try {
+			const response = await this.$axios({
+				method: 'get',
+				url: `${ENDPOINTS.POKEMON_ABILITY}/${ability}`,
+			});
+			if (response.status === 404) {
+				return;
+			}
+			const result = humps(response.data) as PokemonAbility;
+			commit('SET_POKEMON_ABILITY', result);
+			return result;
+		} catch (err) {
+			return undefined;
+		}
+	},
+	async getPokemonType({ commit }, type: string | number) {
+		try {
+			const response = await this.$axios({
+				method: 'get',
+				url: `${ENDPOINTS.POKEMON_TYPE}/${type}`,
+			});
+			if (response.status === 404) {
+				return;
+			}
+			const result = humps(response.data) as PokemonType;
+			commit('SET_POKEMON_TYPE', result);
+			return result;
+		} catch (err) {
+			return undefined;
 		}
 	},
 });

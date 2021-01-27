@@ -28,12 +28,12 @@
 			>
 			<span class="block md:pt-4 lg:pt-4 font-medium text-sm text-gray-500 dark:text-white">The Pokédex contains detailed stats for every creature from the Pokémon games.</span>
 		</header>
-		<div class="block flex-1 py-4 space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-4 sm:items-center">
+		<div class="py-4 space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-4 sm:items-center">
 			<pokemon-card
 				v-for="(pokemon, pokemonIdx) in pokemonList"
 				:key="pokemonIdx"
 				:pokemon="pokemon"
-				:details-updated="detailsUpdated"
+				:details-updated="!$fetchState.pending"
 				@click="onSelectPokemon(pokemon)"
 			/>
 			<div v-if="pokemonList && !pokemonList.length" class="flex flex-col h-full items-center justify-center space-y-4">
@@ -50,43 +50,32 @@
 </template>
 
 <script lang="ts">
-import { Component, Watch, Ref, mixins } from 'nuxt-property-decorator';
-import { Result } from '@/model/pokemon-list';
+import { Component, Ref, mixins } from 'nuxt-property-decorator';
+import { PokemonList } from '@/model/pokemon-list';
 import ChangeTheme from '@/utils/change-theme';
 declare const _: any;
 
 @Component
 export default class IndexPage extends mixins(ChangeTheme) {
 	@Ref('search-pokemon') searchPokemonEl!: HTMLInputElement;
-	detailsUpdated: boolean = false;
 	onSearch!: Function;
 
-	@Watch('$fetchState.pending')
-	async onFetchStatePendingChanged(pending: boolean) {
-		if (!pending) {
-			await this.$accessor.pokemon.getPokemonImagesForListing();
-			this.detailsUpdated = true;
-		}
-	}
-
 	get pokemonList() {
-		return this.$accessor.pokemon.listing.results;
+		return this.$accessor.pokemon.listResponse.results;
 	}
 
 	async fetch() {
-		await this.$accessor.pokemon.getListing();
+		await this.$accessor.pokemon.getListResponse();
 	}
 
 	async mounted() {
 		this.onSearch = await _.debounce(async(event: any) => {
 			const inputEl = event.target as HTMLInputElement;
 			const searchKey = inputEl.value;
+			this.$accessor.pokemon.setListResponse({});
 			if (searchKey !== '') {
-				this.detailsUpdated = false;
 				await this.$accessor.pokemon.searchPokemon(searchKey);
-				this.detailsUpdated = true;
 			} else {
-				this.detailsUpdated = false;
 				this.$fetch();
 			}
 		}, 500);
@@ -104,7 +93,7 @@ export default class IndexPage extends mixins(ChangeTheme) {
 		}
 	}
 
-	onSelectPokemon(pokemon: Result) {
+	onSelectPokemon(pokemon: PokemonList) {
 		this.$router.push(`/${pokemon.name}`);
 	}
 

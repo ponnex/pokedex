@@ -5,7 +5,7 @@
 		@click="event => this.$emit('click', event)"
 	>
 		<svg
-			v-if="!detailsUpdated"
+			v-if="$fetchState.pending"
 			class="fill-current h-full p-2 justify-self-center self-center col-span-1"
 			width="100%"
 			height="100%"
@@ -22,20 +22,22 @@
 				fill="currentColor"
 			/>
 		</svg>
-		<img v-else class="h-full p-2 justify-self-center self-center col-span-1" :src="pokemon.image" :alt="pokemon.name">
+		<img v-else ref="pokemon-image" class="h-24 p-2 justify-self-center self-center col-span-1" :src="pokemonImage()" :alt="pokemon.name">
 		<div class="flex flex-col col-span-2">
 			<span class="text-2xl font-medium pt-2">{{ startCase(pokemon.name) }}</span>
 			<pokemon-type-badge
-				:types="pokemon.types"
+				:types="pokemonTypes()"
 			/>
 		</div>
-		<span v-if="detailsUpdated" class="absolute bottom-0 dark:text-gray-900 font-semibold leading-9 opacity-50 right-0 text-5xl text-white">{{ `#${padStart(pokemon.id, 3, '0')}` }}</span>
+		<span v-if="!$fetchState.pending" class="absolute bottom-0 dark:text-gray-900 font-semibold leading-9 opacity-50 right-0 text-5xl text-white">{{ `#${padStart(pokemonDetails.id, 3, '0')}` }}</span>
 	</div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'nuxt-property-decorator';
-import { Result } from '@/model/pokemon-list';
+import { PokemonList } from '@/model/pokemon-list';
+import { Pokemon } from '@/model/pokemon';
+import { PokemonSpecies } from '@/model/pokemon-species';
 
 declare const _: any;
 
@@ -44,25 +46,36 @@ export default class PokemonCard extends Vue {
 	@Prop({
 		type: Object,
 		default: () => { return {}; },
-	}) pokemon!: Result;
-
-	@Prop({
-		type: Boolean,
-		default: false,
-	}) detailsUpdated!: Boolean;
+	}) pokemon!: PokemonList;
 
 	startCase: Function = _.startCase;
 	padStart: Function = _.padStart;
+	pokemonDetails!: Pokemon | undefined;
+	pokemonSpecies!: PokemonSpecies | undefined;
+
+	pokemonImage() {
+		return this.pokemonDetails ? this.pokemonDetails.sprites.other.officialArtwork.frontDefault : '';
+	}
+
+	pokemonTypes() {
+		return this.pokemonDetails ? this.pokemonDetails.types : [];
+	}
+
+	async fetch() {
+		if (this.pokemon) {
+			this.pokemonDetails = await this.$accessor.pokemon.getPokemon(this.pokemon.name);
+			this.pokemonSpecies = await this.$accessor.pokemon.getPokemonSpecies(this.pokemon.name);
+		}
+	}
 
 	getBgColor() {
-		const color = this.pokemon.color;
-		if (!color) {
-			return 'bg-gray-500';
-		}
+		const color = this.pokemonSpecies ? this.pokemonSpecies.color.name : 'gray';
 		if (color === 'white') {
 			return 'bg-gray-500';
 		} else if (color === 'brown') {
 			return 'bg-yellow-800';
+		} else if (color === 'black') {
+			return this.$colorMode.preference === 'light' ? 'bg-gray-800' : 'bg-gray-700';
 		} else {
 			return color ? `bg-${color}-500` : '';
 		}
