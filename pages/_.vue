@@ -214,7 +214,7 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 
 		setTimeout(() => {
 			window.scrollTo(0, 0);
-		}, 250);
+		}, 500);
 	}
 
 	pokemonColor() {
