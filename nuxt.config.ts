@@ -1,5 +1,7 @@
 import { NuxtConfig } from '@nuxt/types';
 import { ProvidePlugin, NormalModuleReplacementPlugin } from 'webpack';
+import axios from 'axios';
+import { Pokemon } from '@/model/pokemon';
 
 const config: NuxtConfig = {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
@@ -103,6 +105,16 @@ const config: NuxtConfig = {
     classPrefix: '',
     classSuffix: '',
     storageKey: 'nuxt-color-mode',
+  },
+  generate: {
+    routes: () => {
+      return axios.get('https://pokeapi.co/api/v2/pokemon?limit=1118')
+      .then((response) => {
+        return response.data.results.map((post: Pokemon) => {
+          return '/' + post.name;
+        });
+      })
+    },
   },
 }
 
