@@ -30,7 +30,6 @@ $ npm run generate
 For detailed explanation on how things work, check out [Nuxt.js docs](https://nuxtjs.org).
 
 [<img src="https://user-images.githubusercontent.com/10062054/106085019-6be43180-615a-11eb-9b43-0414645ca8ac.jpg" width="250"/>](https://user-images.githubusercontent.com/10062054/106085019-6be43180-615a-11eb-9b43-0414645ca8ac.jpg)
-[<img src="https://user-images.githubusercontent.com/10062054/106085019-6be43180-615a-11eb-9b43-0414645ca8ac.jpg" width="250"/>](https://user-images.githubusercontent.com/10062054/106085019-6be43180-615a-11eb-9b43-0414645ca8ac.jpg)
 [<img src="https://user-images.githubusercontent.com/10062054/106085027-70a8e580-615a-11eb-8bf3-44e3748ada89.jpg" width="250"/>](https://user-images.githubusercontent.com/10062054/106085027-70a8e580-615a-11eb-8bf3-44e3748ada89.jpg)
 [<img src="https://user-images.githubusercontent.com/10062054/106085030-71da1280-615a-11eb-8ebc-af80099c98dd.jpg" width="250"/>](https://user-images.githubusercontent.com/10062054/106085030-71da1280-615a-11eb-8ebc-af80099c98dd.jpg)
 [<img src="https://user-images.githubusercontent.com/10062054/106085033-730b3f80-615a-11eb-80ad-090fbeda64dc.jpg" width="250"/>](https://user-images.githubusercontent.com/10062054/106085033-730b3f80-615a-11eb-80ad-090fbeda64dc.jpg)
