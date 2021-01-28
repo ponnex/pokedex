@@ -59,9 +59,20 @@ const config: NuxtConfig = {
 
   // PWA module configuration: https://go.nuxtjs.dev/pwa
   pwa: {
+    meta: {
+      name: 'Pokédex',
+      nativeUI: true,
+    },
     manifest: {
-      lang: 'en'
-    }
+      name: 'Pokédex',
+      short_name: 'Pokédex',
+      description: 'The Pokédex contains detailed stats for every creature from the Pokémon games',
+      lang: 'en',
+    },
+    con: {
+      source: 'static/icon.png',
+      fileName: 'icon.png'
+    },
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
