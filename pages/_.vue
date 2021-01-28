@@ -1,7 +1,6 @@
 <template>
 	<div class="flex flex-col h-screen text-white">
-		<!-- <div v-if="pokemon && !isFetching"> -->
-		<div v-if="pokemon && !isFetching">
+		<div v-if="!isFetching">
 			<div class="h-56" :class="`bg-${pokemonColor()}`"></div>
 			<div class="details-bg" :class="`bg-${pokemonColor()}`"></div>
 			<div class="absolute flex flex-col h-full p-5 top-0 w-screen space-y-4">
@@ -222,16 +221,13 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 		this.evolutionStages = [];
 		const { pathMatch } = this.$route.params;
 		this.isFetching = true;
-		await this.getPokemon(pathMatch);
+		await this.$accessor.pokemon.getPokemon(pathMatch);
 		await this.$accessor.pokemon.getPokemonSpecies(pathMatch);
 		this.isFetching = false;
 
 		if (this.pokemonSpecies) {
 			const { evolutionChain } = this.pokemonSpecies;
-
-			this.isFetching = true;
 			await this.$accessor.pokemon.getEvolutionChain(parseInt(this.idFromUrl(evolutionChain.url)));
-			this.isFetching = false;
 
 			if (this.pokemonEvolutionChain) {
 				let currentEvolveTo: Chain = this.pokemonEvolutionChain.chain;
@@ -259,10 +255,6 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 				window.scrollTo(0, 0);
 			}, 500);
 		}, 250);
-	}
-
-	async getPokemon(pokemon: string | number) {
-		await this.$accessor.pokemon.getPokemon(pokemon);
 	}
 
 	pokemonColor() {
