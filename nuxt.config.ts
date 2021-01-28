@@ -71,7 +71,7 @@ const config: NuxtConfig = {
     },
     con: {
       source: 'static/icon.png',
-      fileName: 'icon.png'
+      fileName: 'app-icon.png'
     },
   },
 
