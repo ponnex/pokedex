@@ -24,18 +24,7 @@ export const state = () => ({
 	isLoadingList: false as boolean,
 });
 
-export const getters = getterTree(state, {
-	getPokemonByName(state, pokemon: string) {
-		return _.find(state.pokemon, (fetchPokemon: Pokemon) => {
-			return fetchPokemon.name === pokemon;
-		});
-	},
-	getPokemonBySpecies(state, pokemon: string) {
-		return _.find(state.pokemonSpecies, (fetchPokemon: PokemonSpecies) => {
-			return fetchPokemon.name === pokemon;
-		});
-	},
-});
+export const getters = getterTree(state, {});
 
 export const mutations = mutationTree(state, {
 	SET_LIST_RESPONSE(state, listResponse: PokemonListResponse) {

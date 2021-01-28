@@ -199,12 +199,16 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 
 	get pokemon(): Pokemon {
 		const { pathMatch } = this.$route.params;
-		return this.$accessor.pokemon.getPokemonByName(pathMatch);
+		return _.find(this.$accessor.pokemon.pokemon, (pokemon: Pokemon) => {
+			return pokemon.name === pathMatch;
+		});
 	}
 
 	get pokemonSpecies(): PokemonSpecies {
 		const { pathMatch } = this.$route.params;
-		return this.$accessor.pokemon.getPokemonBySpecies(pathMatch);
+		return _.find(this.$accessor.pokemon.pokemonSpecies, (pokemon: PokemonSpecies) => {
+			return pokemon.name === pathMatch;
+		});
 	}
 
 	get pokemonEvolutionChain() {
