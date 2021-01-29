@@ -187,6 +187,7 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 
 	@Watch('$route', { deep: true, immediate: true })
 	async onHashChange(route: any) {
+		console.log('hash');
 		if (route.hash !== '' && route.hash) {
 			this.activeTab = route.hash;
 			if (route.hash === '#evolution') {
@@ -241,6 +242,7 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 	}
 
 	async fetch() {
+		console.log('fetch');
 		const { pathMatch } = this.$route.params;
 		if (!this.pokemon) {
 			await this.$accessor.pokemon.getPokemon(pathMatch);
