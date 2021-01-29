@@ -219,14 +219,16 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 
 	get pokemon(): Pokemon {
 		const { pathMatch } = this.$route.params;
-		return _.find(this.$accessor.pokemon.pokemon, (pokemon: Pokemon) => {
+		const pokemon = this.$accessor.pokemon.pokemon;
+		return _.find(pokemon, (pokemon: Pokemon) => {
 			return pokemon.name === pathMatch;
 		});
 	}
 
 	get pokemonSpecies(): PokemonSpecies {
 		const { pathMatch } = this.$route.params;
-		return _.find(this.$accessor.pokemon.pokemonSpecies, (pokemon: PokemonSpecies) => {
+		const species = this.$accessor.pokemon.pokemonSpecies;
+		return _.find(species, (pokemon: PokemonSpecies) => {
 			return pokemon.name === pathMatch;
 		});
 	}
@@ -241,10 +243,10 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 
 	async fetch() {
 		const { pathMatch } = this.$route.params;
-		if (this.pokemon) {
+		if (!this.pokemon) {
 			await this.$accessor.pokemon.getPokemon(pathMatch);
 		}
-		if (this.pokemonSpecies) {
+		if (!this.pokemonSpecies) {
 			await this.$accessor.pokemon.getPokemonSpecies(pathMatch);
 		}
 	}
