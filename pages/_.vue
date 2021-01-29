@@ -1,6 +1,6 @@
 <template>
 	<div class="flex flex-col h-screen text-white">
-		<div v-if="!isFetching && !$fetchState.pending">
+		<div v-show="!$fetchState.pending">
 			<div class="h-56" :class="`bg-${pokemonColor()}`"></div>
 			<div class="details-bg" :class="`bg-${pokemonColor()}`"></div>
 			<div class="absolute flex flex-col h-full p-5 top-0 w-screen space-y-4">
@@ -159,7 +159,7 @@
 				</div>
 			</div>
 		</div>
-		<div v-else class="grid flex-grow justify-self-center self-center">
+		<div v-show="$fetchState.pending" class="grid flex-grow justify-self-center self-center">
 			<div class="grid justify-self-center self-center">
 				<img src="@/assets/images/pokeball_loading.gif" alt="pokeball_loading" class="h-32 justify-self-center self-center">
 				<span class="justify-self-center self-center text-gray-500 dark:text-white">Loading...</span>
@@ -182,7 +182,6 @@ declare const _: any;
 export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 	startCase: Function = _.startCase;
 	padStart: Function = _.padStart;
-	isFetching: boolean = false;
 	activeTab: string = '#about';
 	evolutionStages: any[] = [];
 
