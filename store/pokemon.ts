@@ -17,7 +17,7 @@ export const state = () => ({
 	listResponse: {} as PokemonListResponse,
 	pokemonAbility: [] as PokemonAbility[],
 	pokemonType: [] as PokemonType[],
-	count: 0 as number,
+	count: 1118 as number,
 	pokemonDamangeRelation: {} as DamageRelations,
 	pokemonEvolutionChain: {} as PokemonEvolutionChain,
 	nextUrl: '' as string,

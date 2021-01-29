@@ -100,11 +100,12 @@ import { Component, Ref, mixins } from 'nuxt-property-decorator';
 import { PokemonList } from '@/model/pokemon-list';
 import ChangeTheme from '@/utils/change-theme';
 import { ENDPOINTS } from '@/model/constants';
+import WindowLocation from '@/utils/window-location';
 
 const defaults = require('@/environment/defaults.json');
 
 @Component
-export default class IndexPage extends mixins(ChangeTheme) {
+export default class IndexPage extends mixins(ChangeTheme, WindowLocation) {
 	@Ref('search-pokemon') searchPokemonEl!: HTMLInputElement;
 	paginationLimit: number = 20;
 	currentPage: number = 1;
@@ -119,7 +120,13 @@ export default class IndexPage extends mixins(ChangeTheme) {
 	}
 
 	async fetch() {
-		await this.$accessor.pokemon.getListResponse();
+		const { search } = this.$route.query;
+		if (search && search !== '') {
+			this.searchKey = search as string;
+			await this.$accessor.pokemon.searchPokemon(search as string);
+		} else {
+			await this.$accessor.pokemon.getListResponse();
+		}
 	}
 
 	get nextUrl() {
@@ -132,13 +139,16 @@ export default class IndexPage extends mixins(ChangeTheme) {
 
 	async onSearchSubmit() {
 		if (this.searchKey !== '') {
+			this.pushState(`${window.location.protocol}//${window.location.host}${window.location.pathname}?search=${this.searchKey}`);
 			await this.$accessor.pokemon.searchPokemon(this.searchKey);
 		}
 	}
 
-	onSearchInput() {
-		if (this.searchKey === '') {
-			this.$fetch();
+	async onSearchInput() {
+		const { search } = this.$route.query;
+		if (this.searchKey === '' && search !== '') {
+			this.pushState(`${window.location.protocol}//${window.location.host}${window.location.pathname}`);
+			await this.$accessor.pokemon.getListResponse();
 		}
 	}
 
