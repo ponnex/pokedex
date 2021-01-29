@@ -175,12 +175,11 @@ export const actions = actionTree({ state, getters, mutations }, {
 				method: 'get',
 				url: `${ENDPOINTS.POKEMON_SPECIES}/${pokemon}`,
 			});
-			if (response.status === 404) {
-				return;
-			}
 			result = humps(response.data) as PokemonSpecies;
 			commit('SET_POKEMON_SPECIES', result);
 		} catch (err) {
+			const species = { name: pokemon as string } as PokemonSpecies;
+			commit('SET_POKEMON_SPECIES', species);
 			return;
 		}
 		return result;

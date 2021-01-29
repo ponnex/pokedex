@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div
-			v-show="getBgColor()"
+			v-show="pokemonSpecies"
 			class="relative inline-grid grid-cols-3 gap-x-4 rounded-2xl min-w-full h-24 text-white dark:text-black shadow cursor-pointer"
 			:class="getBgColor()"
 			@click="event => this.$emit('click', event)"
@@ -39,10 +39,10 @@
 					:types="pokemonTypes()"
 				/>
 			</div>
-			<span v-show="!$fetchState.pending" class="absolute bottom-0 dark:text-gray-900 font-semibold leading-9 opacity-50 right-0 text-5xl text-white">{{ pokemonDetails ? `#${padStart(pokemonDetails.id, 3, '0')}` : '' }}</span>
+			<span class="absolute bottom-0 dark:text-gray-900 font-semibold leading-9 opacity-50 right-0 text-5xl text-white">{{ pokemonDetails ? `#${padStart(pokemonDetails.id, 3, '0')}` : '' }}</span>
 		</div>
 		<div
-			v-if="!getBgColor()"
+			v-if="!pokemonSpecies"
 			class="relative inline-grid grid-cols-3 gap-x-4 rounded-2xl min-w-full h-24 text-white dark:text-black shadow cursor-pointer bg-white dark:bg-gray-800"
 		>
 			<div class="h-16 w-16 p-2 justify-self-center self-center col-span-1 rounded bg-gray-200 dark:bg-gray-700"></div>
@@ -106,7 +106,7 @@ export default class PokemonCard extends Vue {
 	}
 
 	getBgColor() {
-		const color = this.pokemonSpecies ? this.pokemonSpecies.color.name : '';
+		const color = this.pokemonSpecies ? this.pokemonSpecies.color ? this.pokemonSpecies.color.name : 'gray' : 'gray';
 		if (!color) {
 			return;
 		}
