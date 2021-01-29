@@ -60,10 +60,10 @@
 					<img
 						:src="pokemonImage"
 						:alt="pokemon ? pokemon.name: ''"
-						class="h-36 w-36 justify-self-center self-center"
+						class="h-36 w-36 -m-4 justify-self-center self-center"
 					>
 				</div>
-				<div class="flex font-medium justify-center pt-3 space-x-8 text-sm">
+				<div class="flex font-medium justify-center pt-6 space-x-8 text-sm">
 					<a
 						href="#about"
 						class="px-3 py-0.5 rounded shadow"

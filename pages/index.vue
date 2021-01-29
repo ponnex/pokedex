@@ -72,7 +72,7 @@
 				<span class="justify-self-center self-center text-gray-500 dark:text-white">Loading...</span>
 			</div>
 		</div>
-		<div v-else class="flex-grow h-auto lg:grid-cols-3 overflow-y-auto pb-5 sm:gap-4 sm:grid sm:grid-cols-2 sm:items-center sm:space-y-0 space-y-3 xl:grid-cols-4">
+		<div v-else class="flex-grow h-auto lg:grid-cols-3 overflow-y-auto mb-5 sm:gap-4 sm:grid sm:grid-cols-2 sm:items-center sm:space-y-0 space-y-3 xl:grid-cols-4 rounded-2xl">
 			<pokemon-card
 				v-for="(pokemon, pokemonIdx) in pokemonList"
 				:key="pokemonIdx"
