@@ -6,7 +6,7 @@
 			viewBox="0 0 104 104"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
-			class="-right-24 -top-32 fixed h-80 opacity-40 w-80 z-10 lg:h-96 lg:w-96 pointer-events-none"
+			class="fixed h-72 w-72 -right-16 -top-32 lg:h-96 lg:w-96 opacity-40 pointer-events-none"
 		>
 			<path
 				opacity="0.1"
@@ -16,7 +16,7 @@
 				fill="currentColor"
 			/>
 		</svg>
-		<header class="bg-transparent z-10">
+		<header class="bg-transparent">
 			<form class="py-3 space-y-4" autocomplete="off" @submit.prevent="onSearchSubmit">
 				<div class="grid grid-cols-12">
 					<h1 class="col-span-11 text-red-600 text-3xl font-semibold">Pokédex</h1>
