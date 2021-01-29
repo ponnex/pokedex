@@ -1,7 +1,7 @@
 <template>
 	<div class="flex flex-col h-full min-h-screen max-w-screen-2xl mx-auto px-5 pb-5">
 		<header class="sticky flex-none top-0 z-10 bg-white dark:bg-gray-900">
-			<form class="py-3 space-y-4" autocomplete="off" @submit.prevent="">
+			<form class="py-3 space-y-4" autocomplete="off" @submit.prevent="onSearchSubmit">
 				<div class="grid grid-cols-12">
 					<h1 class="col-span-11 text-red-600 text-3xl font-semibold">Pokédex</h1>
 					<svg
@@ -21,12 +21,13 @@
 				<input
 					id="search-pokemon"
 					ref="search-pokemon"
+					v-model="searchKey"
 					type="search"
 					name="search-pokemon"
 					placeholder="Search for a Pokémon"
 					autocomplete="off"
 					class="block font-medium min-w-full text-gray-500 dark:text-black placeholder-gray-500 dark:placeholder-gray-900 bg-gray-200 dark:bg-gray-50 rounded-2xl py-1 px-3"
-					@input="event => onSearch(event)"
+					@input="onSearchInput"
 				>
 				<span class="block md:pt-4 lg:pt-4 font-medium text-xs text-gray-500 dark:text-white">The Pokédex contains detailed stats for every creature from the Pokémon games.</span>
 			</form>
@@ -100,15 +101,14 @@ import { PokemonList } from '@/model/pokemon-list';
 import ChangeTheme from '@/utils/change-theme';
 import { ENDPOINTS } from '@/model/constants';
 
-declare const _: any;
 const defaults = require('@/environment/defaults.json');
 
 @Component
 export default class IndexPage extends mixins(ChangeTheme) {
 	@Ref('search-pokemon') searchPokemonEl!: HTMLInputElement;
-	onSearch!: Function;
 	paginationLimit: number = 20;
 	currentPage: number = 1;
+	searchKey: string = '';
 
 	get pokemonList() {
 		return this.$accessor.pokemon.listResponse.results;
@@ -130,16 +130,16 @@ export default class IndexPage extends mixins(ChangeTheme) {
 		return this.$accessor.pokemon.prevUrl;
 	}
 
-	async mounted() {
-		this.onSearch = await _.debounce(async(event: any) => {
-			const inputEl = event.target as HTMLInputElement;
-			const searchKey = inputEl.value;
-			if (searchKey !== '') {
-				await this.$accessor.pokemon.searchPokemon(searchKey);
-			} else {
-				this.$fetch();
-			}
-		}, 500);
+	async onSearchSubmit() {
+		if (this.searchKey !== '') {
+			await this.$accessor.pokemon.searchPokemon(this.searchKey);
+		}
+	}
+
+	onSearchInput() {
+		if (this.searchKey === '') {
+			this.$fetch();
+		}
 	}
 
 	prevPage() {

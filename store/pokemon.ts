@@ -73,7 +73,8 @@ export const actions = actionTree({ state, getters, mutations }, {
 	setPokemonDamageRelations({ commit }, pokemonDamangeRelation: DamageRelations) {
 		commit('SET_POKEMON_DAMAGE_RELATION', pokemonDamangeRelation);
 	},
-	async getListResponse({ state, commit }, params?: string) {
+	async getListResponse({ commit }, params?: string) {
+		commit('SET_LIST_RESPONSE', {} as PokemonListResponse);
 		if (!params) {
 			params = '';
 		}
