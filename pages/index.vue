@@ -1,6 +1,22 @@
 <template>
-	<div class="flex flex-col h-full min-h-screen max-w-screen-2xl mx-auto pb-5">
-		<header class="sticky flex-none top-0 z-10 bg-white dark:bg-gray-900 px-5">
+	<div class="flex flex-col h-screen max-w-screen-2xl min-h-screen mx-auto p-5">
+		<svg
+			width="104"
+			height="104"
+			viewBox="0 0 104 104"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			class="-right-24 -top-32 fixed h-80 opacity-40 w-80 z-10 lg:h-96 lg:w-96 pointer-events-none"
+		>
+			<path
+				opacity="0.1"
+				fill-rule="evenodd"
+				clip-rule="evenodd"
+				d="M104 52C104 80.7188 80.7188 104 52 104C23.2812 104 0 80.7188 0 52C0 23.2812 23.2812 0 52 0C80.7188 0 104 23.2812 104 52ZM69 52C69 61.3888 61.3888 69 52 69C42.6112 69 35 61.3888 35 52C35 42.6112 42.6112 35 52 35C61.3888 35 69 42.6112 69 52ZM76 52C76 65.2548 65.2548 76 52 76C38.7452 76 28 65.2548 28 52H8C8 76.3005 27.6995 96 52 96C76.3005 96 96 76.3005 96 52H76Z"
+				fill="currentColor"
+			/>
+		</svg>
+		<header class="bg-transparent z-10">
 			<form class="py-3 space-y-4" autocomplete="off" @submit.prevent="onSearchSubmit">
 				<div class="grid grid-cols-12">
 					<h1 class="col-span-11 text-red-600 text-3xl font-semibold">Pokédex</h1>
@@ -56,7 +72,7 @@
 				<span class="justify-self-center self-center text-gray-500 dark:text-white">Loading...</span>
 			</div>
 		</div>
-		<div v-else class="flex-grow py-4 space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-4 sm:items-center px-5">
+		<div v-else class="flex-grow h-auto lg:grid-cols-3 overflow-y-auto pb-5 sm:gap-4 sm:grid sm:grid-cols-2 sm:items-center sm:space-y-0 space-y-3 xl:grid-cols-4">
 			<pokemon-card
 				v-for="(pokemon, pokemonIdx) in pokemonList"
 				:key="pokemonIdx"
