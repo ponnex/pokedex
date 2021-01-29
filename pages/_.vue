@@ -187,7 +187,6 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 
 	@Watch('$route', { deep: true, immediate: true })
 	async onHashChange(route: any) {
-		console.log('hash');
 		if (route.hash !== '' && route.hash) {
 			this.activeTab = route.hash;
 			if (route.hash === '#evolution') {
@@ -218,18 +217,21 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 	}
 
 	get pokemon(): Pokemon {
-		const { pathname } = window.location;
+		const { pathMatch } = this.$route.params;
 		const pokemon = this.$accessor.pokemon.pokemon;
+		console.log(_.find(pokemon, (pokemon: Pokemon) => {
+			return pokemon.name === pathMatch;
+		}));
 		return _.find(pokemon, (pokemon: Pokemon) => {
-			return pokemon.name === pathname.replace('/', '');
+			return pokemon.name === pathMatch;
 		});
 	}
 
 	get pokemonSpecies(): PokemonSpecies {
-		const { pathname } = window.location;
+		const { pathMatch } = this.$route.params;
 		const species = this.$accessor.pokemon.pokemonSpecies;
 		return _.find(species, (pokemon: PokemonSpecies) => {
-			return pokemon.name === pathname.replace('/', '');
+			return pokemon.name === pathMatch;
 		});
 	}
 
@@ -242,7 +244,6 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 	}
 
 	async fetch() {
-		console.log('fetch');
 		const { pathMatch } = this.$route.params;
 		if (!this.pokemon) {
 			await this.$accessor.pokemon.getPokemon(pathMatch);
