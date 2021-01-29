@@ -217,18 +217,18 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 	}
 
 	get pokemon(): Pokemon {
-		const { pathMatch } = this.$route.params;
+		const { pathname } = window.location;
 		const pokemon = this.$accessor.pokemon.pokemon;
 		return _.find(pokemon, (pokemon: Pokemon) => {
-			return pokemon.name === pathMatch;
+			return pokemon.name === pathname.replace('/', '');
 		});
 	}
 
 	get pokemonSpecies(): PokemonSpecies {
-		const { pathMatch } = this.$route.params;
+		const { pathname } = window.location;
 		const species = this.$accessor.pokemon.pokemonSpecies;
 		return _.find(species, (pokemon: PokemonSpecies) => {
-			return pokemon.name === pathMatch;
+			return pokemon.name === pathname.replace('/', '');
 		});
 	}
 
