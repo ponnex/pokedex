@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div
-			v-show="pokemonSpecies"
+			v-show="pokemonSpecies && !$fetchState.pending"
 			class="relative inline-grid grid-cols-3 gap-x-4 rounded-2xl min-w-full h-24 text-white dark:text-black shadow cursor-pointer"
 			:class="getBgColor()"
 			@click="event => this.$emit('click', event)"
@@ -42,7 +42,7 @@
 			<span class="absolute bottom-0 dark:text-gray-900 font-semibold leading-9 opacity-50 right-0 text-5xl text-white">{{ pokemonDetails ? `#${padStart(pokemonDetails.id, 3, '0')}` : '' }}</span>
 		</div>
 		<div
-			v-if="!pokemonSpecies"
+			v-if="!pokemonSpecies && $fetchState.pending"
 			class="relative inline-grid grid-cols-3 gap-x-4 rounded-2xl min-w-full h-24 text-white dark:text-black shadow cursor-pointer bg-white dark:bg-gray-800"
 		>
 			<div class="h-16 w-16 p-2 justify-self-center self-center col-span-1 rounded bg-gray-200 dark:bg-gray-700"></div>
@@ -58,7 +58,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'nuxt-property-decorator';
+import { Vue, Component, Prop, Watch } from 'nuxt-property-decorator';
 import { PokemonList } from '@/model/pokemon-list';
 import { Pokemon } from '@/model/pokemon';
 import { PokemonSpecies } from '@/model/pokemon-species';
@@ -75,6 +75,11 @@ export default class PokemonCard extends Vue {
 	startCase: Function = _.startCase;
 	padStart: Function = _.padStart;
 	isImageLoaded: boolean = false;
+
+	@Watch('pokemon')
+	onPokemonChanged() {
+		this.$fetch();
+	}
 
 	get pokemonDetails(): Pokemon {
 		const pokemon = this.$accessor.pokemon.pokemon;

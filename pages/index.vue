@@ -31,7 +31,7 @@
 				<span class="block md:pt-4 lg:pt-4 font-medium text-xs text-gray-500 dark:text-white">The Pokédex contains detailed stats for every creature from the Pokémon games.</span>
 			</form>
 		</header>
-		<div v-if="isLoadingList" class="flex flex-grow justify-self-center self-center">
+		<div v-if="!pokemonList" class="flex flex-grow justify-self-center self-center">
 			<div class="grid justify-self-center self-center">
 				<img src="@/assets/images/pokeball_loading.gif" alt="pokeball_loading" class="h-32 justify-self-center self-center">
 				<span class="justify-self-center self-center text-gray-500 dark:text-white">Loading...</span>
@@ -56,43 +56,52 @@
 			</div>
 		</div>
 		<div class="min-w-full bottom-0 fixed grid grid-cols-2 h-10 justify-self-center self-center gap-x-20 bg-white dark:bg-gray-900">
-			<svg
-				width="22"
-				height="14"
-				viewBox="0 0 22 14"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-				class="cursor-pointer justify-self-center self-center"
-				@click="prevPage()"
-			>
-				<path
-					d="M7.70711 1.70711C8.09763 1.31658 8.09763 0.683417 7.70711 0.292893C7.31658 -0.0976311 6.68342 -0.0976311 6.29289 0.292893L0.292893 6.29289C-0.097631 6.68342 -0.097631 7.31658 0.292893 7.70711L6.29289 13.7071C6.68342 14.0976 7.31658 14.0976 7.70711 13.7071C8.09763 13.3166 8.09763 12.6834 7.70711 12.2929L3.4142 7.99998H20.9892C21.5476 7.99998 22.0002 7.55227 22.0002 6.99998C22.0002 6.4477 21.5476 5.99998 20.9892 5.99998H3.41423L7.70711 1.70711Z"
-					fill="currentColor"
-				/>
-			</svg>
-			<svg
-				width="22"
-				height="14"
-				viewBox="0 0 22 14"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-				class="cursor-pointer justify-self-center self-center"
-				@click="nextPage()"
-			>
-				<path
-					d="M14.2931 1.70711C13.9026 1.31658 13.9026 0.683417 14.2931 0.292893C14.6837 -0.0976311 15.3168 -0.0976311 15.7074 0.292893L21.7073 6.29289C22.0979 6.68342 22.0979 7.31658 21.7073 7.70711L15.7074 13.7071C15.3168 14.0976 14.6837 14.0976 14.2931 13.7071C13.9026 13.3166 13.9026 12.6834 14.2931 12.2929L18.586 7.99998H1.01103C0.452653 7.99998 0 7.55227 0 6.99998C0 6.4477 0.452653 5.99998 1.01103 5.99998H18.586L14.2931 1.70711Z"
-					fill="currentColor"
-				/>
-			</svg>
+			<div class="grid-cols-1 justify-self-center self-center">
+				<svg
+					v-if="prevUrl"
+					width="22"
+					height="14"
+					viewBox="0 0 22 14"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+					class="cursor-pointer"
+					@click="prevPage()"
+				>
+					<path
+						d="M7.70711 1.70711C8.09763 1.31658 8.09763 0.683417 7.70711 0.292893C7.31658 -0.0976311 6.68342 -0.0976311 6.29289 0.292893L0.292893 6.29289C-0.097631 6.68342 -0.097631 7.31658 0.292893 7.70711L6.29289 13.7071C6.68342 14.0976 7.31658 14.0976 7.70711 13.7071C8.09763 13.3166 8.09763 12.6834 7.70711 12.2929L3.4142 7.99998H20.9892C21.5476 7.99998 22.0002 7.55227 22.0002 6.99998C22.0002 6.4477 21.5476 5.99998 20.9892 5.99998H3.41423L7.70711 1.70711Z"
+						fill="currentColor"
+					/>
+				</svg>
+			</div>
+			<div class="grid-cols-1 justify-self-center self-center">
+				<svg
+					v-if="nextUrl"
+					width="22"
+					height="14"
+					viewBox="0 0 22 14"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+					class="cursor-pointer"
+					@click="nextPage()"
+				>
+					<path
+						d="M14.2931 1.70711C13.9026 1.31658 13.9026 0.683417 14.2931 0.292893C14.6837 -0.0976311 15.3168 -0.0976311 15.7074 0.292893L21.7073 6.29289C22.0979 6.68342 22.0979 7.31658 21.7073 7.70711L15.7074 13.7071C15.3168 14.0976 14.6837 14.0976 14.2931 13.7071C13.9026 13.3166 13.9026 12.6834 14.2931 12.2929L18.586 7.99998H1.01103C0.452653 7.99998 0 7.55227 0 6.99998C0 6.4477 0.452653 5.99998 1.01103 5.99998H18.586L14.2931 1.70711Z"
+						fill="currentColor"
+					/>
+				</svg>
+			</div>
 		</div>
 	</div>
 </template>
 
 <script lang="ts">
 import { Component, Ref, mixins } from 'nuxt-property-decorator';
-import { PokemonList, PokemonListResponse } from '@/model/pokemon-list';
+import { PokemonList } from '@/model/pokemon-list';
 import ChangeTheme from '@/utils/change-theme';
+import { ENDPOINTS } from '@/model/constants';
+
 declare const _: any;
+const defaults = require('@/environment/defaults.json');
 
 @Component
 export default class IndexPage extends mixins(ChangeTheme) {
@@ -109,19 +118,22 @@ export default class IndexPage extends mixins(ChangeTheme) {
 		return Math.ceil(this.$accessor.pokemon.count / this.paginationLimit);
 	}
 
-	get isLoadingList() {
-		return this.$accessor.pokemon.isLoadingList;
+	async fetch() {
+		await this.$accessor.pokemon.getListResponse();
 	}
 
-	async fetch() {
-		await this.$accessor.pokemon.getListResponse({ offset: 0 });
+	get nextUrl() {
+		return this.$accessor.pokemon.nextUrl;
+	}
+
+	get prevUrl() {
+		return this.$accessor.pokemon.prevUrl;
 	}
 
 	async mounted() {
 		this.onSearch = await _.debounce(async(event: any) => {
 			const inputEl = event.target as HTMLInputElement;
 			const searchKey = inputEl.value;
-			this.$accessor.pokemon.setListResponse({} as PokemonListResponse);
 			if (searchKey !== '') {
 				await this.$accessor.pokemon.searchPokemon(searchKey);
 			} else {
@@ -131,15 +143,13 @@ export default class IndexPage extends mixins(ChangeTheme) {
 	}
 
 	prevPage() {
-		this.$accessor.pokemon.setListResponse({} as PokemonListResponse);
-		this.$accessor.pokemon.setIsLoadingList(true);
-		this.$accessor.pokemon.prevPage();
+		const params = this.prevUrl.replace(`${defaults.baseUrl}${ENDPOINTS.POKEMON}`, '');
+		this.$accessor.pokemon.getListResponse(params);
 	}
 
 	nextPage() {
-		this.$accessor.pokemon.setListResponse({} as PokemonListResponse);
-		this.$accessor.pokemon.setIsLoadingList(true);
-		this.$accessor.pokemon.nextPage();
+		const params = this.nextUrl.replace(`${defaults.baseUrl}${ENDPOINTS.POKEMON}`, '');
+		this.$accessor.pokemon.getListResponse(params);
 	}
 
 	activated() {

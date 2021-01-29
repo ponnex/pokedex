@@ -20,8 +20,8 @@ export const state = () => ({
 	count: 0 as number,
 	pokemonDamangeRelation: {} as DamageRelations,
 	pokemonEvolutionChain: {} as PokemonEvolutionChain,
-	currentPageOffset: 0 as number,
-	isLoadingList: false as boolean,
+	nextUrl: '' as string,
+	prevUrl: '' as string,
 });
 
 export const getters = getterTree(state, {});
@@ -58,11 +58,11 @@ export const mutations = mutationTree(state, {
 	SET_POKEMON_EVOLUTION_CHAIN(state, pokemonEvolutionChain: PokemonEvolutionChain) {
 		state.pokemonEvolutionChain = pokemonEvolutionChain;
 	},
-	SET_CURRENT_PAGE_OFFSET(state, currentPageOffset: number) {
-		state.currentPageOffset = currentPageOffset;
+	SET_PREV_URL(state, prevUrl: string) {
+		state.prevUrl = prevUrl;
 	},
-	SET_IS_LOADING_LIST(state, isLoadingList: boolean) {
-		state.isLoadingList = isLoadingList;
+	SET_NEXT_URL(state, nextUrl: string) {
+		state.nextUrl = nextUrl;
 	},
 });
 
@@ -73,51 +73,21 @@ export const actions = actionTree({ state, getters, mutations }, {
 	setPokemonDamageRelations({ commit }, pokemonDamangeRelation: DamageRelations) {
 		commit('SET_POKEMON_DAMAGE_RELATION', pokemonDamangeRelation);
 	},
-	setIsLoadingList({ commit }, isLoading: boolean) {
-		commit('SET_IS_LOADING_LIST', isLoading);
-	},
-	async nextPage({ state, dispatch }) {
-		try {
-			const offset = (state.currentPageOffset + 20 < state.count) ? state.currentPageOffset + 20 : Math.ceil(state.count / 20);
-			if (offset >= state.count) {
-				return;
-			}
-			await dispatch('getListResponse', { offset });
-		} catch (err) {
-			throw new Error(err);
+	async getListResponse({ state, commit }, params?: string) {
+		if (!params) {
+			params = '';
 		}
-	},
-	async prevPage({ state, dispatch }) {
-		try {
-			const offset = (state.currentPageOffset > 20) ? state.currentPageOffset - 20 : 0;
-			if (!offset) {
-				return;
-			}
-			await dispatch('getListResponse', { offset });
-		} catch (err) {
-			throw new Error(err);
-		}
-	},
-	async getListResponse({ commit }, { offset }: any) {
 		let result;
 		try {
-			commit('SET_IS_LOADING_LIST', true);
 			const response = await this.$axios({
 				method: 'get',
-				url: `${ENDPOINTS.POKEMON}?offset=${offset}&limit=20`,
+				url: `${ENDPOINTS.POKEMON}${params}`,
 			});
 			result = humps(response.data) as PokemonListResponse;
-			let newPageOffset;
-			if (result.previous) {
-				const url = new URL(result.previous);
-				newPageOffset = parseInt(url.searchParams.get('offset') as string) + 20;
-			} else {
-				newPageOffset = 0;
-			}
-			commit('SET_CURRENT_PAGE_OFFSET', newPageOffset);
 			commit('SET_LIST_RESPONSE', result);
 			commit('SET_COUNT', result.count);
-			commit('SET_IS_LOADING_LIST', false);
+			commit('SET_PREV_URL', result.previous);
+			commit('SET_NEXT_URL', result.next);
 		} catch (err) {
 			return;
 		}
