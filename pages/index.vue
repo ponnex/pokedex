@@ -18,17 +18,35 @@
 						<path v-if="$colorMode.preference == 'dark'" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
 					</svg>
 				</div>
-				<input
-					id="search-pokemon"
-					ref="search-pokemon"
-					v-model="searchKey"
-					type="search"
-					name="search-pokemon"
-					placeholder="Search for a Pokémon"
-					autocomplete="off"
-					class="block font-medium min-w-full text-gray-500 dark:text-black placeholder-gray-500 dark:placeholder-gray-900 bg-gray-200 dark:bg-gray-50 rounded-2xl py-1 px-3"
-					@input="onSearchInput"
-				>
+				<div class="space-x-6">
+					<svg
+						v-if="isSearching"
+						width="22"
+						height="14"
+						viewBox="0 0 22 14"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+						class="inline-block col-span-11 cursor-pointer"
+						@click="backFromSearch()"
+					>
+						<path
+							d="M7.70711 1.70711C8.09763 1.31658 8.09763 0.683417 7.70711 0.292893C7.31658 -0.0976311 6.68342 -0.0976311 6.29289 0.292893L0.292893 6.29289C-0.097631 6.68342 -0.097631 7.31658 0.292893 7.70711L6.29289 13.7071C6.68342 14.0976 7.31658 14.0976 7.70711 13.7071C8.09763 13.3166 8.09763 12.6834 7.70711 12.2929L3.4142 7.99998H20.9892C21.5476 7.99998 22.0002 7.55227 22.0002 6.99998C22.0002 6.4477 21.5476 5.99998 20.9892 5.99998H3.41423L7.70711 1.70711Z"
+							fill="currentColor"
+						/>
+					</svg>
+					<input
+						id="search-pokemon"
+						ref="search-pokemon"
+						v-model="searchKey"
+						type="search"
+						name="search-pokemon"
+						placeholder="Search for a Pokémon"
+						autocomplete="off"
+						:class="[{'min-w-full': !isSearching}, {'w-10/12': isSearching}]"
+						class="inline-block font-medium text-gray-500 dark:text-black placeholder-gray-500 dark:placeholder-gray-900 bg-gray-200 dark:bg-gray-50 rounded-2xl py-1 px-3"
+						@input="onSearchInput"
+					>
+				</div>
 				<span class="block md:pt-4 lg:pt-4 font-medium text-xs text-gray-500 dark:text-white">The Pokédex contains detailed stats for every creature from the Pokémon games.</span>
 			</form>
 		</header>
@@ -110,6 +128,7 @@ export default class IndexPage extends mixins(ChangeTheme, WindowLocation) {
 	paginationLimit: number = 20;
 	currentPage: number = 1;
 	searchKey: string = '';
+	isSearching: boolean = false;
 
 	get pokemonList() {
 		return this.$accessor.pokemon.listResponse.results;
@@ -119,13 +138,14 @@ export default class IndexPage extends mixins(ChangeTheme, WindowLocation) {
 		return Math.ceil(this.$accessor.pokemon.count / this.paginationLimit);
 	}
 
-	async fetch() {
+	fetch() {
 		const { search } = this.$route.query;
 		if (search && search !== '') {
 			this.searchKey = search as string;
-			await this.$accessor.pokemon.searchPokemon(search as string);
+			this.isSearching = true;
+			this.$accessor.pokemon.searchPokemon(search as string);
 		} else {
-			await this.$accessor.pokemon.getListResponse();
+			this.$accessor.pokemon.getListResponse();
 		}
 	}
 
@@ -137,19 +157,26 @@ export default class IndexPage extends mixins(ChangeTheme, WindowLocation) {
 		return this.$accessor.pokemon.prevUrl;
 	}
 
-	async onSearchSubmit() {
+	onSearchSubmit() {
 		if (this.searchKey !== '') {
 			this.pushState(`${window.location.protocol}//${window.location.host}${window.location.pathname}?search=${this.searchKey}`);
-			await this.$accessor.pokemon.searchPokemon(this.searchKey);
+			this.isSearching = true;
+			this.$accessor.pokemon.searchPokemon(this.searchKey);
 		}
 	}
 
-	async onSearchInput() {
+	onSearchInput() {
 		const { search } = this.$route.query;
 		if (this.searchKey === '' && search !== '') {
 			this.pushState(`${window.location.protocol}//${window.location.host}${window.location.pathname}`);
-			await this.$accessor.pokemon.getListResponse();
+			this.isSearching = false;
+			this.$accessor.pokemon.getListResponse();
 		}
+	}
+
+	backFromSearch() {
+		this.searchKey = '';
+		this.onSearchInput();
 	}
 
 	prevPage() {
