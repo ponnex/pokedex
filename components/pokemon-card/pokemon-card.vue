@@ -84,16 +84,16 @@ export default class PokemonCard extends Vue {
 	get pokemonDetails(): Pokemon {
 		const pokemon = this.$accessor.pokemon.pokemon;
 		return _.find(pokemon, (pokemon: Pokemon) => {
-			const regex = new RegExp(this.pokemon.name, 'i');
-			return regex.test(pokemon.name);
+			const regex = new RegExp(pokemon.name, 'i');
+			return regex.test(this.pokemon.name);
 		});
 	}
 
 	get pokemonSpecies(): PokemonSpecies {
 		const species = this.$accessor.pokemon.pokemonSpecies;
 		return _.find(species, (pokemon: PokemonSpecies) => {
-			const regex = new RegExp(this.pokemon.name, 'i');
-			return regex.test(pokemon.name);
+			const regex = new RegExp(pokemon.name, 'i');
+			return regex.test(this.pokemon.name);
 		});
 	}
 

@@ -220,8 +220,8 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 		const { pathMatch } = this.$route.params;
 		const pokemon = this.$accessor.pokemon.pokemon;
 		return _.find(pokemon, (pokemon: Pokemon) => {
-			const regex = new RegExp(pathMatch, 'i');
-			return regex.test(pokemon.name);
+			const regex = new RegExp(pokemon.name, 'i');
+			return regex.test(pathMatch);
 		});
 	}
 
@@ -229,8 +229,8 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 		const { pathMatch } = this.$route.params;
 		const species = this.$accessor.pokemon.pokemonSpecies;
 		return _.find(species, (pokemon: PokemonSpecies) => {
-			const regex = new RegExp(pathMatch, 'i');
-			return regex.test(pokemon.name);
+			const regex = new RegExp(pokemon.name, 'i');
+			return regex.test(pathMatch);
 		});
 	}
 
