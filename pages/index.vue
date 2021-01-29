@@ -143,12 +143,12 @@ export default class IndexPage extends mixins(ChangeTheme) {
 	}
 
 	prevPage() {
-		const params = this.prevUrl.replace(`${defaults.baseUrl}${ENDPOINTS.POKEMON}`, '');
+		const params = this.prevUrl?.replace(`${defaults.baseUrl}${ENDPOINTS.POKEMON}`, '');
 		this.$accessor.pokemon.getListResponse(params);
 	}
 
 	nextPage() {
-		const params = this.nextUrl.replace(`${defaults.baseUrl}${ENDPOINTS.POKEMON}`, '');
+		const params = this.nextUrl?.replace(`${defaults.baseUrl}${ENDPOINTS.POKEMON}`, '');
 		this.$accessor.pokemon.getListResponse(params);
 	}
 

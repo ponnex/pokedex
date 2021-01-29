@@ -125,14 +125,15 @@ export const actions = actionTree({ state, getters, mutations }, {
 				},
 				url: `${ENDPOINTS.POKEMON}`,
 			});
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			const { results, count, ...list } = humps(response.data) as PokemonListResponse;
+			const { results } = humps(response.data) as PokemonListResponse;
 			const pokemonResults = results as PokemonList[];
 			const regex = new RegExp(pokemon.toString(), 'i');
 			const pokemonSearch = _.filter(pokemonResults, (pokemonResult: PokemonList) => {
 				return regex.test(pokemonResult.name);
 			});
-			result = { results: pokemonSearch, count: pokemonSearch.length, ...list };
+			result = { results: pokemonSearch, count: pokemonSearch.length, previous: '', next: '' } as PokemonListResponse;
+			commit('SET_PREV_URL', '');
+			commit('SET_NEXT_URL', '');
 			commit('SET_LIST_RESPONSE', result);
 		} catch (err) {
 			return;
