@@ -19,7 +19,7 @@
 					fill="currentColor"
 				/>
 			</svg>
-			<div class="absolute flex flex-col h-full p-5 top-0 w-screen space-y-4">
+			<div class="absolute flex flex-col h-screen p-5 top-0 w-screen space-y-4">
 				<div class="grid grid-cols-12 fill-current text-white dark:text-gray-900">
 					<svg
 						width="22"
@@ -86,7 +86,7 @@
 						Evolution
 					</a>
 				</div>
-				<div class="details-container no-scrollbar text-gray-700 dark:text-white flex overflow-x-scroll overflow-y-hidden w-full">
+				<div class="details-container no-scrollbar text-gray-700 dark:text-white flex flex-grow overflow-x-scroll overflow-y-hidden w-full">
 					<section v-if="pokemon" id="about" class="details-section flex-grow flex flex-col min-w-full space-y-5">
 						<div class="flex flex-col items-center justify-center">
 							<span class="break-words text-justify text-sm">{{ pokemonDescription() }}</span>
