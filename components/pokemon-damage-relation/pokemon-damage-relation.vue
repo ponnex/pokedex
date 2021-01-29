@@ -1,5 +1,5 @@
 <template>
-	<div class="my-5">
+	<div class="mt-5">
 		<div v-if="damageType === 'strength'" class="gap-4 grid">
 			<div
 				v-for="(strengths, strengthsIdx) in pokemonDamageRelations.strength"
