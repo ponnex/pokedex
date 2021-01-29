@@ -1,6 +1,6 @@
 <template>
-	<div class="flex flex-col h-full min-h-screen max-w-screen-2xl mx-auto px-5 pb-5">
-		<header class="sticky flex-none top-0 z-10 bg-white dark:bg-gray-900">
+	<div class="flex flex-col h-full min-h-screen max-w-screen-2xl mx-auto pb-5">
+		<header class="sticky flex-none top-0 z-10 bg-white dark:bg-gray-900 px-5">
 			<form class="py-3 space-y-4" autocomplete="off" @submit.prevent="onSearchSubmit">
 				<div class="grid grid-cols-12">
 					<h1 class="col-span-11 text-red-600 text-3xl font-semibold">Pokédex</h1>
@@ -50,13 +50,13 @@
 				<span class="block md:pt-4 lg:pt-4 font-medium text-xs text-gray-500 dark:text-white">The Pokédex contains detailed stats for every creature from the Pokémon games.</span>
 			</form>
 		</header>
-		<div v-if="!pokemonList" class="flex flex-grow justify-self-center self-center">
+		<div v-if="!pokemonList" class="flex flex-grow justify-self-center self-center px-5">
 			<div class="grid justify-self-center self-center">
 				<img src="@/assets/images/pokeball_loading.gif" alt="pokeball_loading" class="h-32 justify-self-center self-center">
 				<span class="justify-self-center self-center text-gray-500 dark:text-white">Loading...</span>
 			</div>
 		</div>
-		<div v-else class="flex-grow py-4 space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-4 sm:items-center">
+		<div v-else class="flex-grow py-4 space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-4 sm:items-center px-5">
 			<pokemon-card
 				v-for="(pokemon, pokemonIdx) in pokemonList"
 				:key="pokemonIdx"
@@ -158,7 +158,7 @@ export default class IndexPage extends mixins(ChangeTheme, WindowLocation) {
 	}
 
 	onSearchSubmit() {
-		if (this.searchKey !== '') {
+		if (this.searchKey !== '' && this.searchKey.length >= 3) {
 			this.pushState(`${window.location.protocol}//${window.location.host}${window.location.pathname}?search=${this.searchKey}`);
 			this.isSearching = true;
 			this.$accessor.pokemon.searchPokemon(this.searchKey);
