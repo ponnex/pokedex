@@ -49,8 +49,20 @@ export default class PokemonCard extends Vue {
 
 	startCase: Function = _.startCase;
 	padStart: Function = _.padStart;
-	pokemonDetails!: Pokemon | undefined;
-	pokemonSpecies!: PokemonSpecies | undefined;
+
+	get pokemonDetails(): Pokemon {
+		const pokemon = this.$accessor.pokemon.pokemon;
+		return _.find(pokemon, (pokemon: Pokemon) => {
+			return pokemon.name === this.pokemon.name;
+		});
+	}
+
+	get pokemonSpecies(): PokemonSpecies {
+		const species = this.$accessor.pokemon.pokemonSpecies;
+		return _.find(species, (pokemon: PokemonSpecies) => {
+			return pokemon.name === this.pokemon.name;
+		});
+	}
 
 	pokemonImage() {
 		return this.pokemonDetails ? this.pokemonDetails.sprites.other.officialArtwork.frontDefault : '';
@@ -62,8 +74,8 @@ export default class PokemonCard extends Vue {
 
 	async fetch() {
 		if (this.pokemon) {
-			this.pokemonDetails = await this.$accessor.pokemon.getPokemon(this.pokemon.name);
-			this.pokemonSpecies = await this.$accessor.pokemon.getPokemonSpecies(this.pokemon.name);
+			await this.$accessor.pokemon.getPokemon(this.pokemon.name);
+			await this.$accessor.pokemon.getPokemonSpecies(this.pokemon.name);
 		}
 	}
 

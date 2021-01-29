@@ -187,9 +187,29 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 	evolutionStages: any[] = [];
 
 	@Watch('$route', { deep: true, immediate: true })
-	onHashChange(route: any) {
+	async onHashChange(route: any) {
 		if (route.hash !== '' && route.hash) {
 			this.activeTab = route.hash;
+			if (route.hash === '#evolution') {
+				if (this.pokemonSpecies) {
+					const { evolutionChain } = this.pokemonSpecies;
+					await this.$accessor.pokemon.getEvolutionChain(parseInt(this.idFromUrl(evolutionChain.url)));
+					if (this.pokemonEvolutionChain) {
+						let currentEvolveTo: Chain = this.pokemonEvolutionChain.chain;
+						do {
+							const evolveFrom = currentEvolveTo;
+							const evolveTo = currentEvolveTo.evolvesTo ? currentEvolveTo.evolvesTo[0] : undefined;
+							currentEvolveTo = evolveTo!;
+							if (evolveTo) {
+								this.evolutionStages.push({
+									evolveFrom,
+									evolveTo,
+								});
+							}
+						} while (currentEvolveTo);
+					}
+				}
+			}
 			setTimeout(() => {
 				document.querySelector(`a[href='${route.hash}']`)?.scrollIntoView();
 				document.querySelector(`${route.hash}`)?.scrollIntoView();
@@ -221,45 +241,18 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 
 	async fetch() {
 		const { pathMatch } = this.$route.params;
-		await this.$accessor.pokemon.getPokemon(pathMatch);
-		await this.$accessor.pokemon.getPokemonSpecies(pathMatch);
+		if (this.pokemon) {
+			await this.$accessor.pokemon.getPokemon(pathMatch);
+		}
+		if (this.pokemonSpecies) {
+			await this.$accessor.pokemon.getPokemonSpecies(pathMatch);
+		}
 	}
 
-	async activated() {
-		this.$fetch();
-		this.evolutionStages = [];
-		if (this.pokemonSpecies) {
-			const { evolutionChain } = this.pokemonSpecies;
-			this.isFetching = true;
-			await this.$accessor.pokemon.getEvolutionChain(parseInt(this.idFromUrl(evolutionChain.url)));
-			this.isFetching = false;
-
-			if (this.pokemonEvolutionChain) {
-				let currentEvolveTo: Chain = this.pokemonEvolutionChain.chain;
-				do {
-					const evolveFrom = currentEvolveTo;
-					const evolveTo = currentEvolveTo.evolvesTo ? currentEvolveTo.evolvesTo[0] : undefined;
-					currentEvolveTo = evolveTo!;
-					if (evolveTo) {
-						this.evolutionStages.push({
-							evolveFrom,
-							evolveTo,
-						});
-					}
-				} while (currentEvolveTo);
-			}
-		}
-
-		if (this.$route.hash === '') {
-			window.location.hash = '#about';
-		}
-
+	activated() {
 		setTimeout(() => {
-			this.onHashChange(this.$route.hash);
-			setTimeout(() => {
-				window.scrollTo(0, 0);
-			}, 500);
-		}, 250);
+			window.scrollTo(0, 0);
+		}, 500);
 	}
 
 	pokemonColor() {
