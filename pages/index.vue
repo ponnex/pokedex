@@ -56,7 +56,7 @@
 			</div>
 		</div>
 		<div class="min-w-full bottom-0 fixed grid grid-cols-2 h-10 justify-self-center self-center gap-x-20 bg-white dark:bg-gray-900">
-			<div class="grid-cols-1 justify-self-center self-center">
+			<div class="h-full w-full grid-cols-1 justify-self-center self-center">
 				<svg
 					v-if="prevUrl"
 					width="22"
@@ -64,7 +64,7 @@
 					viewBox="0 0 22 14"
 					fill="none"
 					xmlns="http://www.w3.org/2000/svg"
-					class="cursor-pointer"
+					class="h-full m-auto cursor-pointer"
 					@click="prevPage()"
 				>
 					<path
@@ -73,7 +73,7 @@
 					/>
 				</svg>
 			</div>
-			<div class="grid-cols-1 justify-self-center self-center">
+			<div class="h-full w-full grid-cols-1 justify-self-center self-center">
 				<svg
 					v-if="nextUrl"
 					width="22"
@@ -81,7 +81,7 @@
 					viewBox="0 0 22 14"
 					fill="none"
 					xmlns="http://www.w3.org/2000/svg"
-					class="cursor-pointer"
+					class="h-full m-auto cursor-pointer"
 					@click="nextPage()"
 				>
 					<path
