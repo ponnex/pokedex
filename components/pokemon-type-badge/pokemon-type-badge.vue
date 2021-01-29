@@ -2,11 +2,16 @@
 	<div v-if="types" class="flex space-x-2 mt-2">
 		<div
 			v-for="(type, typeIdx) in types"
+			v-show="isBadgeImageLoaded"
 			:key="typeIdx"
 			class="flex p-1 gap-x-1"
 			:class="[`${type.type.name}`, {'rounded': full}, {'rounded-xl': !full}]"
 		>
-			<img class="h-3 self-center" :src="require(`@/assets/images/types/${type.type.name}.svg`)" />
+			<img
+				class="h-3 self-center"
+				:src="require(`@/assets/images/types/${type.type.name}.svg`)"
+				@load="onLoad()"
+			/>
 			<span v-if="full" class="type-name font-bold text-white">{{ upperCase(type.type.name) }}</span>
 		</div>
 	</div>
@@ -30,6 +35,11 @@ export default class PokemonTypeBadge extends Vue {
 	}) full!: Boolean;
 
 	upperCase: Function = _.upperCase;
+	isBadgeImageLoaded: boolean = false;
+
+	onLoad() {
+		this.isBadgeImageLoaded = true;
+	}
 }
 </script>
 
