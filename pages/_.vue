@@ -129,7 +129,7 @@
 						</div>
 						<span class="font-black pt-2 text-xl" :class="`text-${pokemonColor()}`">Moves</span>
 						<div class="grid grid-cols-5 font-black text-xs gap-0.5">
-							<span v-for="(move, moveIdx) in pokemon.moves" :key="moveIdx" class="moves-name leading-none text-gray-700 dark:text-white text-sm">{{ startCase(move.move.name) }}</span>
+							<span v-for="(move, moveIdx) in filterMoves(pokemon.moves)" :key="moveIdx" class="moves-name leading-none text-gray-700 dark:text-white text-sm">{{ startCase(move.move.name) }}</span>
 						</div>
 					</section>
 					<section v-if="pokemon" id="stats" class="details-section flex-grow min-w-full">
@@ -187,7 +187,7 @@
 <script lang="ts">
 import { Component, mixins, Watch } from 'nuxt-property-decorator';
 import ChangeTheme from '@/utils/change-theme';
-import { Pokemon } from '@/model/pokemon';
+import { Move, Pokemon } from '@/model/pokemon';
 import { FlavorTextEntry, PokemonSpecies } from '@/model/pokemon-species';
 import IdFromUrl from '@/utils/id-from-url';
 import { Chain } from '@/model/pokemon-evolution-chain';
@@ -329,6 +329,12 @@ export default class PokemonDetilsPage extends mixins(ChangeTheme, IdFromUrl) {
 
 	onHome() {
 		this.$router.push('/');
+	}
+
+	filterMoves(moves: Move[]) {
+		return _.filter(moves, (move: Move) => {
+			return move.versionGroupDetails[0].levelLearnedAt === 0;
+		});
 	}
 }
 </script>
