@@ -1,5 +1,5 @@
 <template>
-	<div class="grid grid-cols-8 mt-10">
+	<div class="grid grid-cols-8">
 		<img
 			:src="pokemonImage(evolutionStage.evolveFrom.species.name)"
 			:alt="evolutionStage.evolveFrom.species.name"
