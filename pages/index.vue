@@ -183,7 +183,7 @@ export default class IndexPage extends mixins(ChangeTheme) {
 	onSearchInput() {
 		const { search } = this.$route.query;
 		if (this.searchKey === '' && search) {
-			this.$router.push(`/?search=${this.searchKey}`);
+			this.$router.push('/');
 			this.isSearching = false;
 			this.$accessor.pokemon.getListResponse();
 		}
