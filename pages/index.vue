@@ -72,7 +72,7 @@
 				<span class="justify-self-center self-center text-gray-500 dark:text-white">Loading...</span>
 			</div>
 		</div>
-		<div v-else class="flex-grow h-auto lg:grid-cols-3 overflow-y-auto mb-5 sm:gap-4 sm:grid sm:grid-cols-2 sm:items-center sm:space-y-0 space-y-3 xl:grid-cols-4 rounded-2xl">
+		<div v-else class="h-auto lg:grid-cols-3 overflow-y-auto mb-5 sm:gap-4 sm:grid sm:grid-cols-2 sm:items-center sm:space-y-0 space-y-3 xl:grid-cols-4 rounded-2xl">
 			<pokemon-card
 				v-for="(pokemon, pokemonIdx) in pokemonList"
 				:key="pokemonIdx"
@@ -134,12 +134,11 @@ import { Component, Ref, mixins } from 'nuxt-property-decorator';
 import { PokemonList } from '@/model/pokemon-list';
 import ChangeTheme from '@/utils/change-theme';
 import { ENDPOINTS } from '@/model/constants';
-import WindowLocation from '@/utils/window-location';
 
 const defaults = require('@/environment/defaults.json');
 
 @Component
-export default class IndexPage extends mixins(ChangeTheme, WindowLocation) {
+export default class IndexPage extends mixins(ChangeTheme) {
 	@Ref('search-pokemon') searchPokemonEl!: HTMLInputElement;
 	paginationLimit: number = 20;
 	currentPage: number = 1;
@@ -156,7 +155,7 @@ export default class IndexPage extends mixins(ChangeTheme, WindowLocation) {
 
 	fetch() {
 		const { search } = this.$route.query;
-		if (search && search !== '') {
+		if (search) {
 			this.searchKey = search as string;
 			this.isSearching = true;
 			this.$accessor.pokemon.searchPokemon(search as string);
@@ -175,16 +174,15 @@ export default class IndexPage extends mixins(ChangeTheme, WindowLocation) {
 
 	onSearchSubmit() {
 		if (this.searchKey !== '' && this.searchKey.length >= 3) {
-			this.pushState(`${window.location.protocol}//${window.location.host}${window.location.pathname}?search=${this.searchKey}`);
-			this.isSearching = true;
+			this.$router.push(`/?search=${this.searchKey}`);
 			this.$accessor.pokemon.searchPokemon(this.searchKey);
 		}
 	}
 
 	onSearchInput() {
 		const { search } = this.$route.query;
-		if (this.searchKey === '' && search !== '') {
-			this.pushState(`${window.location.protocol}//${window.location.host}${window.location.pathname}`);
+		if (this.searchKey === '' && search) {
+			this.$router.push(`/?search=${this.searchKey}`);
 			this.isSearching = false;
 			this.$accessor.pokemon.getListResponse();
 		}
