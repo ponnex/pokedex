@@ -2,7 +2,7 @@
 	<div>
 		<div
 			v-show="pokemonSpecies && !$fetchState.pending"
-			class="relative inline-grid grid-cols-3 gap-x-4 rounded-2xl min-w-full h-24 text-white dark:text-black shadow cursor-pointer"
+			class="relative inline-grid grid-cols-3 gap-x-4 rounded-2xl min-w-full h-24 2xl:h-auto text-white dark:text-black shadow cursor-pointer"
 			:class="getBgColor()"
 			@click="event => this.$emit('click', event)"
 		>
@@ -27,7 +27,7 @@
 				<img
 					v-show="isImageLoaded"
 					ref="pokemon-image"
-					class="h-24 p-2"
+					class="h-24 2xl:h-auto p-2"
 					:src="pokemonImage()"
 					:alt="pokemon.name"
 					@load="onImageLoad()"
@@ -43,14 +43,14 @@
 		</div>
 		<div
 			v-if="!pokemonSpecies && $fetchState.pending"
-			class="relative inline-grid grid-cols-3 gap-x-4 rounded-2xl min-w-full h-24 text-white dark:text-black shadow cursor-pointer bg-white dark:bg-gray-800"
+			class="bg-white cursor-pointer dark:bg-gray-800 dark:text-black gap-x-4 grid-cols-4 2xl:grid-cols-3 inline-grid min-w-full p-4 relative rounded-2xl shadow text-white"
 		>
-			<div class="h-16 w-16 p-2 justify-self-center self-center col-span-1 rounded bg-gray-200 dark:bg-gray-700"></div>
-			<div class="flex flex-col col-span-2">
-				<div class="font-medium h-5 mt-5 text-2xl w-11/12 rounded bg-gray-100 dark:bg-gray-700"></div>
+			<div class="2xl:h-20 2xl:w-20 bg-gray-200 col-span-1 dark:bg-gray-700 h-16 justify-self-center p-2 rounded self-center w-16"></div>
+			<div class="flex flex-col col-span-3 2xl:col-span-2">
+				<div class="2xl:h-6 bg-gray-100 dark:bg-gray-700 font-medium h-5 rounded text-2xl w-11/12"></div>
 				<div class="flex space-x-2 mt-3">
-					<div class="h-5 w-5 self-center flex p-1 gap-x-1 rounded-full bg-gray-100 dark:bg-gray-700"></div>
-					<div class="h-5 w-5 self-center flex p-1 gap-x-1 rounded-full bg-gray-100 dark:bg-gray-700"></div>
+					<div class="2xl:h-6 2xl:w-6 bg-gray-100 dark:bg-gray-700 flex gap-x-1 h-5 p-1 rounded-full self-center w-5"></div>
+					<div class="2xl:h-6 2xl:w-6 bg-gray-100 dark:bg-gray-700 flex gap-x-1 h-5 p-1 rounded-full self-center w-5"></div>
 				</div>
 			</div>
 		</div>
