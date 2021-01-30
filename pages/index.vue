@@ -155,11 +155,12 @@ export default class IndexPage extends mixins(ChangeTheme) {
 
 	fetch() {
 		const { search } = this.$route.query;
-		if (search) {
+		if (search && search.length >= 3) {
 			this.searchKey = search as string;
 			this.isSearching = true;
 			this.$accessor.pokemon.searchPokemon(search as string);
 		} else {
+			this.$router.push('/');
 			this.$accessor.pokemon.getListResponse();
 		}
 	}
