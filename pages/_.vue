@@ -1,25 +1,27 @@
 <template>
-	<div class="flex flex-col h-screen text-white">
+	<div class="max-h-screen overflow-hidden text-white">
 		<div v-show="pokemon && !$fetchState.pending">
-			<div class="h-56" :class="`bg-${pokemonColor()}`"></div>
-			<div class="details-bg max-w-screen-2xl" :class="`bg-${pokemonColor()}`"></div>
-			<svg
-				width="104"
-				height="104"
-				viewBox="0 0 104 104"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-				class="fixed h-80 w-80 lg:h-96 lg:w-96 opacity-75 pointer-events-none -left-24 2xl:left-auto -top-28 "
-			>
-				<path
-					opacity="0.1"
-					fill-rule="evenodd"
-					clip-rule="evenodd"
-					d="M104 52C104 80.7188 80.7188 104 52 104C23.2812 104 0 80.7188 0 52C0 23.2812 23.2812 0 52 0C80.7188 0 104 23.2812 104 52ZM69 52C69 61.3888 61.3888 69 52 69C42.6112 69 35 61.3888 35 52C35 42.6112 42.6112 35 52 35C61.3888 35 69 42.6112 69 52ZM76 52C76 65.2548 65.2548 76 52 76C38.7452 76 28 65.2548 28 52H8C8 76.3005 27.6995 96 52 96C76.3005 96 96 76.3005 96 52H76Z"
-					fill="currentColor"
-				/>
-			</svg>
-			<div class="max-w-screen-2xl absolute flex flex-col h-screen p-5 top-0 w-screen">
+			<div class="fixed w-full z-10 top-0 max-w-screen-2xl">
+				<div class="h-56" :class="`bg-${pokemonColor()}`"></div>
+				<div class="details-bg" :class="`bg-${pokemonColor()}`"></div>
+				<svg
+					width="104"
+					height="104"
+					viewBox="0 0 104 104"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+					class="fixed h-80 w-80 lg:h-96 lg:w-96 opacity-75 pointer-events-none -left-24 2xl:left-auto -top-28 "
+				>
+					<path
+						opacity="0.1"
+						fill-rule="evenodd"
+						clip-rule="evenodd"
+						d="M104 52C104 80.7188 80.7188 104 52 104C23.2812 104 0 80.7188 0 52C0 23.2812 23.2812 0 52 0C80.7188 0 104 23.2812 104 52ZM69 52C69 61.3888 61.3888 69 52 69C42.6112 69 35 61.3888 35 52C35 42.6112 42.6112 35 52 35C61.3888 35 69 42.6112 69 52ZM76 52C76 65.2548 65.2548 76 52 76C38.7452 76 28 65.2548 28 52H8C8 76.3005 27.6995 96 52 96C76.3005 96 96 76.3005 96 52H76Z"
+						fill="currentColor"
+					/>
+				</svg>
+			</div>
+			<div class="fixed w-full z-10 top-0 max-w-screen-2xl p-5">
 				<div class="grid grid-cols-12 fill-current text-white dark:text-gray-900">
 					<svg
 						width="22"
@@ -63,8 +65,10 @@
 						class="h-40 w-40 -m-4 justify-self-center self-center"
 					>
 				</div>
-				<div v-if="pokemon" class="no-scrollbar text-gray-700 dark:text-white overflow-auto flex-grow flex flex-col min-w-full space-y-5 mt-12">
-					<div class="flex flex-col items-center justify-center">
+			</div>
+			<div class="z-0 max-w-screen-2xl flex flex-col h-screen p-5 pt-56 w-screen">
+				<div v-if="pokemon" class="no-scrollbar text-gray-700 dark:text-white overflow-auto flex-grow flex flex-col min-w-full space-y-5">
+					<div class="flex flex-col items-center justify-center mt-14">
 						<span class="break-words text-justify text-sm">{{ pokemonDescription() }}</span>
 					</div>
 					<pokemon-type-badge
@@ -146,7 +150,7 @@
 				</div>
 			</div>
 		</div>
-		<div v-show="!pokemon && $fetchState.pending" class="grid flex-grow justify-self-center self-center">
+		<div v-show="!pokemon && $fetchState.pending" class="grid min-h-screen flex-grow justify-self-center self-center">
 			<div class="grid justify-self-center self-center">
 				<img src="@/assets/images/pokeball_loading.gif" alt="pokeball_loading" class="h-32 justify-self-center self-center">
 				<span class="justify-self-center self-center text-gray-500 dark:text-white">Loading...</span>
