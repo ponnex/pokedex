@@ -72,7 +72,7 @@
 				<span class="justify-self-center self-center text-gray-500 dark:text-white">Loading...</span>
 			</div>
 		</div>
-		<div v-else class="h-auto lg:grid-cols-3 overflow-y-auto mb-5 sm:gap-4 sm:grid sm:grid-cols-2 sm:items-center sm:space-y-0 space-y-3 xl:grid-cols-4 rounded-2xl">
+		<div v-else ref="pokemon-list" class="h-auto lg:grid-cols-3 overflow-y-auto mb-5 sm:gap-4 sm:grid sm:grid-cols-2 sm:items-center sm:space-y-0 space-y-3 xl:grid-cols-4 rounded-2xl">
 			<pokemon-card
 				v-for="(pokemon, pokemonIdx) in pokemonList"
 				:key="pokemonIdx"
@@ -140,6 +140,7 @@ const defaults = require('@/environment/defaults.json');
 @Component
 export default class IndexPage extends mixins(ChangeTheme) {
 	@Ref('search-pokemon') searchPokemonEl!: HTMLInputElement;
+	@Ref('pokemon-list') pokemonListEl!: HTMLElement;
 	paginationLimit: number = 20;
 	currentPage: number = 1;
 	searchKey: string = '';
@@ -194,14 +195,20 @@ export default class IndexPage extends mixins(ChangeTheme) {
 		this.onSearchInput();
 	}
 
-	prevPage() {
-		const params = this.prevUrl?.replace(`${defaults.baseUrl}${ENDPOINTS.POKEMON}`, '');
-		this.$accessor.pokemon.getListResponse(params);
+	scrollListToTop() {
+		this.pokemonListEl.scrollTo(0, 0);
 	}
 
-	nextPage() {
+	async prevPage() {
+		const params = this.prevUrl?.replace(`${defaults.baseUrl}${ENDPOINTS.POKEMON}`, '');
+		await this.$accessor.pokemon.getListResponse(params);
+		this.scrollListToTop();
+	}
+
+	async nextPage() {
 		const params = this.nextUrl?.replace(`${defaults.baseUrl}${ENDPOINTS.POKEMON}`, '');
-		this.$accessor.pokemon.getListResponse(params);
+		await this.$accessor.pokemon.getListResponse(params);
+		this.scrollListToTop();
 	}
 
 	activated() {
