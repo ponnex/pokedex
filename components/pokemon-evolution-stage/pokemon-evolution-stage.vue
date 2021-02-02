@@ -1,21 +1,29 @@
 <template>
 	<div class="grid grid-cols-8">
-		<img
-			:src="pokemonImage(evolutionStage.evolveFrom.species.name)"
-			:alt="evolutionStage.evolveFrom.species.name"
+		<n-link
+			tag="a"
+			:to="`/${evolutionStage.evolveFrom.species.name}`"
 			class="col-span-3 h-28 justify-self-start self-center w-28 cursor-pointer"
-			@click="redirectTo(evolutionStage.evolveFrom.species.name)"
 		>
+			<img
+				:src="pokemonImage(evolutionStage.evolveFrom.species.name)"
+				:alt="evolutionStage.evolveFrom.species.name"
+			>
+		</n-link>
 		<div class="grid grid-rows-2 col-span-2 gap-y-2">
 			<span class="justify-self-center self-end text-xs" :class="`text-${pokemonColor}`">Level {{ evolutionStage.evolveTo.evolutionDetails[0].minLevel }}</span>
 			<div class="bg-gray-300 dark:bg-gray-600 h-1 rounded-sm"></div>
 		</div>
-		<img
-			:src="pokemonImage(evolutionStage.evolveTo.species.name)"
-			:alt="evolutionStage.evolveTo.species.name"
-			class="col-span-3 h-28 justify-self-end self-center w-28 cursor-pointer"
-			@click="redirectTo(evolutionStage.evolveTo.species.name)"
+		<n-link
+			tag="a"
+			:to="`/${evolutionStage.evolveTo.species.name}`"
+			class="col-span-3 h-28 justify-self-start self-center w-28 cursor-pointer"
 		>
+			<img
+				:src="pokemonImage(evolutionStage.evolveTo.species.name)"
+				:alt="evolutionStage.evolveTo.species.name"
+			>
+		</n-link>
 	</div>
 </template>
 
@@ -56,10 +64,6 @@ export default class PokemonEvolutionStage extends mixins(IdFromUrl) {
 	async fetch() {
 		await this.$accessor.pokemon.getPokemon(this.evolutionStage.evolveFrom.species.name);
 		await this.$accessor.pokemon.getPokemon(this.evolutionStage.evolveTo.species.name);
-	}
-
-	redirectTo(pokemon: string) {
-		window.open(`${window.location.origin}/${pokemon}`, '_self');
 	}
 }
 </script>
