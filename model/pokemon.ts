@@ -27,7 +27,14 @@ export interface Move {
 
 export interface DreamWorld {
   frontDefault: string;
-  frontFemale?: any;
+  frontFemale: string | null;
+}
+
+export interface Home {
+  frontDefault: string;
+  frontFemale: string | null;
+  frontShiny: string | null;
+  frontShinyFemale: string | null;
 }
 
 export interface OfficialArtwork {
@@ -36,6 +43,7 @@ export interface OfficialArtwork {
 
 export interface Other {
   dreamWorld: DreamWorld;
+  home: Home;
   officialArtwork: OfficialArtwork;
 }
 

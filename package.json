@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "clean": "rimraf dist",
-    "dev": "cross-env HOST=0.0.0.0 nuxt-ts dev",
-    "build": "nuxt-ts build",
-    "start": "nuxt-ts start",
+    "dev": "cross-env HOST=0.0.0.0 nuxt dev",
+    "build": "nuxt build",
+    "start": "nuxt start",
     "pregenerate": "npm run clean",
-    "generate": "cross-env nuxt-ts generate",
+    "generate": "cross-env nuxt generate",
     "lint:js": "eslint --ext \".js,.vue\" --ignore-path .gitignore .",
     "lint": "npm run lint:js"
   },
@@ -27,20 +27,19 @@
     "@nuxtjs/color-mode": "^2.0.2",
     "@nuxtjs/eslint-config-typescript": "^5.0.0",
     "@nuxtjs/eslint-module": "^3.0.2",
-    "@nuxtjs/tailwindcss": "^3.4.2",
-    "@tailwindcss/postcss7-compat": "^2.0.2",
-    "autoprefixer": "^9.8.6",
+    "@nuxtjs/tailwindcss": "^6.11.4",
+    "autoprefixer": "^10.4.17",
     "babel-eslint": "^10.1.0",
     "cross-env": "^7.0.3",
     "eslint": "^7.18.0",
     "eslint-plugin-nuxt": "^2.0.0",
     "eslint-plugin-vue": "^7.4.1",
-    "node-sass": "^5.0.0",
+    "node-sass": "^9.0.0",
     "nuxt-typed-vuex": "^0.1.22",
-    "postcss": "^7.0.35",
+    "postcss": "^8.4.35",
     "rimraf": "^3.0.2",
     "sass-loader": "^10.1.1",
     "stylelint-config-recommended": "^3.0.0",
-    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.2"
+    "tailwindcss": "^3.4.1"
   }
 }

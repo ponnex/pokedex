@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col h-screen max-w-screen-2xl min-h-screen mx-auto p-5">
+	<div class="flex flex-col h-screen max-w-screen-2xl min-h-screen mx-auto p-5 lg:px-12">
 		<svg
 			width="104"
 			height="104"
@@ -72,7 +72,7 @@
 				<span class="justify-self-center self-center text-gray-500 dark:text-white">Loading...</span>
 			</div>
 		</div>
-		<div v-else ref="pokemon-list" class="h-auto lg:grid-cols-3 overflow-y-auto mb-5 sm:gap-4 sm:grid sm:grid-cols-2 sm:items-center sm:space-y-0 space-y-3 xl:grid-cols-4 rounded-2xl">
+		<div v-else ref="pokemon-list" class="h-auto lg:grid-cols-3 overflow-y-auto mb-5 sm:gap-4 sm:grid sm:grid-cols-2 sm:items-center sm:space-y-0 space-y-3 xl:grid-cols-4 rounded-2xl scrollable">
 			<pokemon-card
 				v-for="(pokemon, pokemonIdx) in pokemonList"
 				:key="pokemonIdx"

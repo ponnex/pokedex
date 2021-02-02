@@ -37,6 +37,7 @@
 				<span class="text-2xl font-medium pt-2">{{ startCase(pokemon.name) }}</span>
 				<pokemon-type-badge
 					:types="pokemonTypes()"
+					:text-only="true"
 				/>
 			</div>
 			<span class="absolute bottom-0 dark:text-gray-900 font-semibold leading-9 opacity-50 right-0 text-5xl text-white">{{ pokemonDetails ? `#${padStart(pokemonDetails.id, 3, '0')}` : '' }}</span>
@@ -47,10 +48,9 @@
 		>
 			<div class="2xl:h-20 2xl:w-20 bg-gray-200 col-span-1 dark:bg-gray-700 h-16 justify-self-center p-2 rounded self-center w-16"></div>
 			<div class="flex flex-col col-span-3 2xl:col-span-2">
-				<div class="2xl:h-6 bg-gray-100 dark:bg-gray-700 font-medium h-5 rounded text-2xl w-11/12"></div>
+				<div :class="varyingSkeletonNameWidth"></div>
 				<div class="flex space-x-2 mt-3">
-					<div class="2xl:h-6 2xl:w-6 bg-gray-100 dark:bg-gray-700 flex gap-x-1 h-5 p-1 rounded-full self-center w-5"></div>
-					<div class="2xl:h-6 2xl:w-6 bg-gray-100 dark:bg-gray-700 flex gap-x-1 h-5 p-1 rounded-full self-center w-5"></div>
+					<div v-for="(skeletonType, skeletonTypeIdx) in randomSkeletonTypeCount" :key="skeletonTypeIdx" class="2xl:h-6 2xl:w-6 bg-gray-100 dark:bg-gray-700 flex gap-x-1 h-5 p-1 rounded-full self-center w-5"></div>
 				</div>
 			</div>
 		</div>
@@ -58,15 +58,15 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'nuxt-property-decorator';
+import { Component, Prop, Watch, mixins } from 'nuxt-property-decorator';
 import { PokemonList } from '@/model/pokemon-list';
 import { Pokemon } from '@/model/pokemon';
 import { PokemonSpecies } from '@/model/pokemon-species';
-
+import getRandomIntInclusive from '@/utils/number';
 declare const _: any;
 
 @Component
-export default class PokemonCard extends Vue {
+export default class PokemonCard extends mixins(getRandomIntInclusive) {
 	@Prop({
 		type: Object,
 		default: () => { return {}; },
@@ -93,6 +93,14 @@ export default class PokemonCard extends Vue {
 		return _.find(species, (pokemon: PokemonSpecies) => {
 			return this.pokemon.name === pokemon.name;
 		});
+	}
+
+	get randomSkeletonTypeCount(): number {
+		return this.getRandomIntInclusive(1, 3);
+	}
+
+	get varyingSkeletonNameWidth(): string {
+		return `2xl:h-6 bg-gray-100 dark:bg-gray-700 font-medium h-5 rounded text-2xl w-${this.getRandomIntInclusive(6, 11)}/12`;
 	}
 
 	pokemonImage() {

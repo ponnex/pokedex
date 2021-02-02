@@ -48,6 +48,35 @@ html {
 	}
 }
 
+/*
+	Scrollbar styles
+*/
+/* Firefox */
+* {
+	scrollbar-width: auto;
+	scrollbar-color: #8a2be2 rgba(255, 255, 255, 0.1);
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+	background: rgba(255, 255, 255, 0.1);
+	border-radius: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+	background-color: #8a2be2;
+	border-radius: 8px;
+}
+
+.scrollable {
+	@apply pr-2 mr-2;
+}
+
 .bug {
 	background: #92BC2C;
 }

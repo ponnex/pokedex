@@ -10,6 +10,8 @@
 			<img
 				class="h-3 self-center"
 				:src="require(`@/assets/images/types/${type.type.name}.svg`)"
+				:title="`${capitalize(type.type.name)}`"
+				:alt="`${capitalize(type.type.name)}`"
 				@load="onImageLoad()"
 			/>
 			<span v-if="full" class="type-name font-bold text-white">{{ upperCase(type.type.name) }}</span>
@@ -35,6 +37,7 @@ export default class PokemonTypeBadge extends Vue {
 	}) full!: Boolean;
 
 	upperCase: Function = _.upperCase;
+	capitalize: Function = _.capitalize;
 	isBadgeImageLoaded: boolean = false;
 
 	onImageLoad() {

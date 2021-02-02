@@ -16,7 +16,7 @@ const config: NuxtConfig = {
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: '' }
+      { hid: 'description', name: 'description', content: 'Discover the ultimate Pokedex PWA app for all your Pokemon needs. Get detailed data, stats, abilities, strengths, weaknesses, and evolution information. Catch \'em all!' }
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }

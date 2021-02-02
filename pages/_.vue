@@ -1,6 +1,6 @@
 <template>
 	<div class="max-h-screen overflow-hidden text-white">
-		<div v-show="pokemon && !$fetchState.pending">
+		<div v-show="pokemon && !$fetchState.pending" class="flex flex-col">
 			<div class="fixed w-full z-10 top-0 max-w-screen-2xl">
 				<div class="h-56" :class="`bg-${pokemonColor()}`"></div>
 				<div class="details-bg" :class="`bg-${pokemonColor()}`"></div>
@@ -22,7 +22,7 @@
 				</svg>
 			</div>
 			<div class="fixed w-full z-10 top-0 max-w-screen-2xl p-5">
-				<div class="grid grid-cols-12 fill-current text-white dark:text-gray-900">
+				<div class="flex justify-between fill-current text-white dark:text-gray-900 max-w-screen-lg mx-auto">
 					<svg
 						width="22"
 						height="14"
@@ -51,7 +51,7 @@
 						<path v-if="$colorMode.preference == 'dark'" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
 					</svg>
 				</div>
-				<div class="mt-2 flex flex-col leading-none">
+				<div class="mt-6 flex flex-col leading-none max-w-screen-lg mx-auto">
 					<div class="inline-grid grid-cols-3">
 						<span class="col-span-2 font-bold text-3xl">{{ pokemon ? startCase(pokemon.name) : '' }}</span>
 						<span class="col-span-1 text-white dark:text-gray-900 opacity-75 font-bold justify-self-end self-center text-4xl">{{ pokemon ? `#${padStart(pokemon.id, 3, '0')}`: '' }}</span>
@@ -62,12 +62,12 @@
 					<img
 						:src="pokemonImage"
 						:alt="pokemon ? pokemon.name: ''"
-						class="h-40 w-40 -m-4 justify-self-center self-center"
+						class="h-40 w-40 -mt-16 justify-self-center self-center"
 					>
 				</div>
 			</div>
 			<div class="z-0 max-w-screen-2xl flex flex-col h-screen p-5 pt-56 w-screen">
-				<div v-if="pokemon" class="no-scrollbar text-gray-700 dark:text-white overflow-auto flex-grow flex flex-col min-w-full space-y-5">
+				<div v-if="pokemon" class="no-scrollbar text-gray-700 dark:text-white overflow-auto flex-grow flex flex-col space-y-5 max-w-screen-lg mx-auto">
 					<div class="flex flex-col items-center justify-center mt-14">
 						<span class="break-words text-justify text-sm">{{ pokemonDescription() }}</span>
 					</div>

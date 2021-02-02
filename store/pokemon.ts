@@ -1,8 +1,8 @@
 import { getterTree, mutationTree, actionTree } from 'nuxt-typed-vuex';
+import humps from 'lodash-humps';
 import { PokemonListResponse, PokemonList } from '@/model/pokemon-list';
 import { Pokemon } from '@/model/pokemon';
 import { ENDPOINTS } from '@/model/constants';
-import humps from 'lodash-humps';
 import { PokemonSpecies } from '@/model/pokemon-species';
 import { PokemonAbility } from '@/model/pokemon-ability';
 import { PokemonType, DamageRelations } from '@/model/pokemin-type';
