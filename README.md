@@ -14,7 +14,7 @@
 
 
 ## Website
-Go and checkout a working [DEMO](http://ponnex-pokedex.netlify.app/) here.
+Go and checkout a working [DEMO](https://pokedex-ponnex.netlify.app/) here.
 
 ## Open API
 
