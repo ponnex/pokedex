@@ -9,3 +9,12 @@ const JSDELIVR_BASE = 'https://cdn.jsdelivr.net/gh/PokeAPI/sprites@master';
 export function spriteUrl(url: string): string {
 	return url ? url.replace(GITHUB_RAW_BASE, JSDELIVR_BASE) : '';
 }
+
+/**
+ * Builds the official-artwork sprite URL straight from a Pokemon id,
+ * so list cards don't need a per-Pokemon REST call to discover it.
+ * @param {number} id Pokemon id
+ */
+export function officialArtworkUrl(id: number): string {
+	return `${JSDELIVR_BASE}/sprites/pokemon/other/official-artwork/${id}.png`;
+}

@@ -67,7 +67,7 @@
 				<span class="block md:pt-4 lg:pt-4 font-medium text-xs text-gray-500 dark:text-white">The Pokédex contains detailed stats for every creature from the Pokémon games.</span>
 			</form>
 		</header>
-		<div v-if="!pokemonList" class="flex flex-grow justify-self-center self-center px-5">
+		<div v-if="pending" class="flex flex-grow justify-self-center self-center px-5">
 			<div class="grid justify-self-center self-center">
 				<img src="~/assets/images/pokeball_loading.gif" alt="pokeball_loading" class="h-32 justify-self-center self-center">
 				<span class="justify-self-center self-center text-gray-500 dark:text-white">Loading...</span>
@@ -75,13 +75,12 @@
 		</div>
 		<div v-else ref="pokemon-list" class="h-auto lg:grid-cols-3 overflow-y-auto mb-5 sm:gap-4 sm:grid sm:grid-cols-2 sm:items-center sm:space-y-0 space-y-3 xl:grid-cols-4 rounded-2xl scrollable">
 			<pokemon-card
-				v-for="(pokemon, pokemonIdx) in pokemonList"
-				:key="pokemonIdx"
+				v-for="pokemon in pokemonList"
+				:key="pokemon.id"
 				:pokemon="pokemon"
-				:details-updated="!pending"
 				@click="onSelectPokemon(pokemon)"
 			/>
-			<div v-if="pokemonList && !pokemonList.length" class="grid justify-center space-y-4">
+			<div v-if="!pokemonList.length" class="grid justify-center space-y-4">
 				<span>No Pokémon found</span>
 				<button
 					class="border-2 border-gray-300 p-1 px-2 rounded-xl text-sm"
@@ -94,7 +93,7 @@
 		<div class="min-w-full bottom-0 fixed grid grid-cols-2 h-10 justify-self-center self-center gap-x-20 bg-white dark:bg-gray-900">
 			<div class="h-full w-full grid-cols-1 justify-self-center self-center">
 				<svg
-					v-if="prevUrl"
+					v-if="hasPrevPage"
 					width="22"
 					height="14"
 					viewBox="0 0 22 14"
@@ -111,7 +110,7 @@
 			</div>
 			<div class="h-full w-full grid-cols-1 justify-self-center self-center">
 				<svg
-					v-if="nextUrl"
+					v-if="hasNextPage"
 					width="22"
 					height="14"
 					viewBox="0 0 22 14"
@@ -131,13 +130,13 @@
 </template>
 
 <script setup lang="ts">
-import type { PokemonList } from '~/types/pokemon-list';
-import { ENDPOINTS } from '~/types/constants';
+import type { PokemonIndexEntry } from '~/types/pokemon-list';
+
+const PAGE_SIZE = 20;
 
 const pokemonStore = usePokemonStore();
 const route = useRoute();
 const router = useRouter();
-const config = useRuntimeConfig();
 const colorMode = useColorMode();
 const { onChangeTheme } = useChangeTheme();
 
@@ -145,33 +144,57 @@ const searchPokemonEl = useTemplateRef<HTMLInputElement>('search-pokemon');
 const pokemonListEl = useTemplateRef<HTMLElement>('pokemon-list');
 
 const searchKey = ref('');
+// The applied search term (set on submit/deep-link, not on every keystroke)
+const activeSearch = ref('');
 const isSearching = ref(false);
 const selectedTypes = ref<string[]>([]);
-// Local pending state (replaces the Nuxt 2 `$fetchState.pending`)
+const page = ref(0);
+// True only while the one-off GraphQL index loads
 const pending = ref(true);
 
-const pokemonList = computed(() => {
-	return pokemonStore.listResponse.results;
+// Everything below derives from the in-memory index — no API calls involved
+const filteredList = computed<PokemonIndexEntry[]>(() => {
+	let list = pokemonStore.pokemonIndex;
+	if (selectedTypes.value.length) {
+		list = list.filter(pokemon => selectedTypes.value.every(type => pokemon.types.includes(type)));
+	}
+	if (activeSearch.value) {
+		const regex = new RegExp(activeSearch.value, 'i');
+		list = list.filter(pokemon => regex.test(pokemon.name));
+	}
+	return list;
 });
 
-const nextUrl = computed(() => {
-	return pokemonStore.nextUrl;
+// Search/filter results show all at once; only the plain list paginates
+const isFiltering = computed(() => {
+	return isSearching.value || selectedTypes.value.length > 0;
 });
 
-const prevUrl = computed(() => {
-	return pokemonStore.prevUrl;
+const pokemonList = computed<PokemonIndexEntry[]>(() => {
+	if (isFiltering.value) {
+		return filteredList.value;
+	}
+	return filteredList.value.slice(page.value * PAGE_SIZE, (page.value + 1) * PAGE_SIZE);
+});
+
+const hasPrevPage = computed(() => {
+	return !isFiltering.value && page.value > 0;
+});
+
+const hasNextPage = computed(() => {
+	return !isFiltering.value && (page.value + 1) * PAGE_SIZE < filteredList.value.length;
 });
 
 const scrollListToTop = () => {
 	pokemonListEl.value?.scrollTo(0, 0);
 };
 
-// Applies the current search + type filter state: syncs the URL query and
-// fetches through the matching store action (filter > search > plain list)
-const applyFilters = async() => {
-	pending.value = true;
+// Applies the current search + type filter state and syncs the URL query
+const applyFilters = () => {
 	const search = searchKey.value.length >= 3 ? searchKey.value : '';
+	activeSearch.value = search;
 	isSearching.value = !!search;
+	page.value = 0;
 	const query: Record<string, string> = {};
 	if (search) {
 		query.search = search;
@@ -180,16 +203,6 @@ const applyFilters = async() => {
 		query.types = selectedTypes.value.join(',');
 	}
 	router.push({ path: '/', query });
-	if (selectedTypes.value.length) {
-		await pokemonStore.filterPokemonByTypes(selectedTypes.value, search || undefined);
-	}
-	else if (search) {
-		await pokemonStore.searchPokemon(search);
-	}
-	else {
-		await pokemonStore.getListResponse();
-	}
-	pending.value = false;
 	scrollListToTop();
 };
 
@@ -198,11 +211,14 @@ const fetchList = async() => {
 	const { search, types } = route.query;
 	if (search && (search as string).length >= 3) {
 		searchKey.value = search as string;
+		activeSearch.value = search as string;
+		isSearching.value = true;
 	}
 	if (typeof types === 'string' && types) {
 		selectedTypes.value = types.split(',');
 	}
-	await applyFilters();
+	await pokemonStore.getPokemonIndex();
+	pending.value = false;
 };
 
 fetchList();
@@ -228,23 +244,17 @@ const onTypesChange = () => {
 	applyFilters();
 };
 
-const prevPage = async() => {
-	const params = prevUrl.value?.replace(`${config.public.apiBase}${ENDPOINTS.POKEMON}`, '');
-	await pokemonStore.getListResponse(params);
+const prevPage = () => {
+	page.value = Math.max(0, page.value - 1);
 	scrollListToTop();
 };
 
-const nextPage = async() => {
-	const params = nextUrl.value?.replace(`${config.public.apiBase}${ENDPOINTS.POKEMON}`, '');
-	await pokemonStore.getListResponse(params);
+const nextPage = () => {
+	page.value = page.value + 1;
 	scrollListToTop();
 };
 
-onActivated(() => {
-	pokemonStore.setListResponse(pokemonStore.listResponse);
-});
-
-const onSelectPokemon = (pokemon: PokemonList) => {
+const onSelectPokemon = (pokemon: PokemonIndexEntry) => {
 	router.push(`/${pokemon.name}`);
 };
 
