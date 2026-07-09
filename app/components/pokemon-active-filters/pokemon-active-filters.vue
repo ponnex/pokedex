@@ -6,7 +6,7 @@
 			type="button"
 			:class="type"
 			:aria-label="`Remove ${capitalize(type)} filter`"
-			class="flex items-center shrink-0 gap-x-1 px-3 py-1.5 rounded-xl cursor-pointer shadow-sm transition-opacity duration-200 hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:focus-visible:ring-white"
+			class="flex items-center shrink-0 h-7 gap-x-1.5 px-3 rounded-xl cursor-pointer shadow-sm transition-opacity duration-200 hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:focus-visible:ring-white"
 			@click="removeType(type)"
 		>
 			<img
@@ -24,7 +24,7 @@
 			:key="`gen-${generation}`"
 			type="button"
 			:aria-label="`Remove Gen ${generation} filter`"
-			class="flex items-center shrink-0 gap-x-1.5 px-3 py-1.5 rounded-xl cursor-pointer bg-red-600 shadow-sm transition-opacity duration-200 hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:focus-visible:ring-white"
+			class="flex items-center shrink-0 h-7 gap-x-1.5 px-3 rounded-xl cursor-pointer bg-red-600 shadow-sm transition-opacity duration-200 hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:focus-visible:ring-white"
 			@click="removeGeneration(generation)"
 		>
 			<span class="pill-label font-bold text-white">GEN {{ ROMAN[generation - 1] }}</span>
@@ -37,7 +37,7 @@
 			:key="`cat-${category}`"
 			type="button"
 			:aria-label="`Remove ${capitalize(category)} filter`"
-			class="flex items-center shrink-0 gap-x-1.5 px-3 py-1.5 rounded-xl cursor-pointer bg-gray-700 dark:bg-gray-600 shadow-sm transition-opacity duration-200 hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:focus-visible:ring-white"
+			class="flex items-center shrink-0 h-7 gap-x-1.5 px-3 rounded-xl cursor-pointer bg-gray-700 dark:bg-gray-600 shadow-sm transition-opacity duration-200 hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:focus-visible:ring-white"
 			@click="removeCategory(category)"
 		>
 			<span class="pill-label font-bold text-white">{{ upperCase(category) }}</span>
@@ -47,7 +47,7 @@
 		</button>
 		<button
 			type="button"
-			class="shrink-0 px-2 py-1 rounded-xl cursor-pointer text-xs font-medium text-gray-500 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:focus-visible:ring-white"
+			class="flex items-center shrink-0 h-7 px-3 rounded-xl cursor-pointer text-xs font-medium text-gray-500 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:focus-visible:ring-white"
 			@click="emit('update:modelValue', { types: [], generations: [], categories: [] })"
 		>
 			Clear all
