@@ -85,10 +85,10 @@
 				<span class="block md:pt-4 lg:pt-4 font-medium text-xs text-gray-500 dark:text-white">The Pokédex contains detailed stats for every creature from the Pokémon games.</span>
 			</form>
 		</header>
-		<div v-if="pending" ref="pokemon-list" class="flex-1 min-h-0 lg:grid-cols-3 overflow-y-auto mb-5 sm:gap-4 sm:grid sm:grid-cols-2 sm:content-start sm:items-center sm:space-y-0 space-y-3 xl:grid-cols-4 rounded-2xl scrollable">
+		<div v-if="pending" ref="pokemon-list" class="flex-1 min-h-0 lg:grid-cols-3 overflow-y-auto mb-10 sm:gap-4 sm:grid sm:grid-cols-2 sm:content-start sm:items-center sm:space-y-0 space-y-3 xl:grid-cols-4 rounded-2xl scrollable">
 			<pokemon-card-skeleton v-for="skeletonIdx in pageSize" :key="skeletonIdx" />
 		</div>
-		<div v-else ref="pokemon-list" class="flex-1 min-h-0 lg:grid-cols-3 overflow-y-auto mb-5 sm:gap-4 sm:grid sm:grid-cols-2 sm:content-start sm:items-center sm:space-y-0 space-y-3 xl:grid-cols-4 rounded-2xl scrollable">
+		<div v-else ref="pokemon-list" class="flex-1 min-h-0 lg:grid-cols-3 overflow-y-auto mb-10 sm:gap-4 sm:grid sm:grid-cols-2 sm:content-start sm:items-center sm:space-y-0 space-y-3 xl:grid-cols-4 rounded-2xl scrollable">
 			<pokemon-card
 				v-for="pokemon in pokemonList"
 				:key="pokemon.id"
@@ -141,7 +141,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="min-w-full bottom-0 fixed flex h-10 items-center justify-center gap-x-8 bg-white dark:bg-gray-900 text-gray-700 dark:text-white">
+		<div class="min-w-full bottom-0 fixed flex h-14 pb-4 items-center justify-center gap-x-8 bg-white dark:bg-gray-900 text-gray-700 dark:text-white">
 			<template v-if="!isFiltering">
 				<button
 					type="button"
