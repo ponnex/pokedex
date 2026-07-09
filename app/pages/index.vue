@@ -179,12 +179,13 @@ const activeFilterCount = computed(() => {
 });
 
 // Everything below derives from the in-memory index — no API calls involved.
-// Types combine as AND (dual-type match); generations and categories as OR.
+// All filter groups combine as OR within the group: a Pokemon matches when
+// it has any of the selected types / generations / categories.
 const filteredList = computed<PokemonIndexEntry[]>(() => {
 	let list = pokemonStore.pokemonIndex;
 	const { types, generations, categories } = filters.value;
 	if (types.length) {
-		list = list.filter(pokemon => types.every(type => pokemon.types.includes(type)));
+		list = list.filter(pokemon => types.some(type => pokemon.types.includes(type)));
 	}
 	if (generations.length) {
 		list = list.filter(pokemon => generations.includes(pokemon.generation));
