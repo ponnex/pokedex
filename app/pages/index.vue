@@ -85,10 +85,10 @@
 				<span class="block md:pt-4 lg:pt-4 font-medium text-xs text-gray-500 dark:text-white">The Pokédex contains detailed stats for every creature from the Pokémon games.</span>
 			</form>
 		</header>
-		<div v-if="pending" class="h-auto lg:grid-cols-3 overflow-y-auto mb-5 sm:gap-4 sm:grid sm:grid-cols-2 sm:items-center sm:space-y-0 space-y-3 xl:grid-cols-4 rounded-2xl scrollable">
-			<pokemon-card-skeleton v-for="skeletonIdx in PAGE_SIZE" :key="skeletonIdx" />
+		<div v-if="pending" ref="pokemon-list" class="flex-1 min-h-0 lg:grid-cols-3 overflow-y-auto mb-5 sm:gap-4 sm:grid sm:grid-cols-2 sm:items-center sm:space-y-0 space-y-3 xl:grid-cols-4 rounded-2xl scrollable">
+			<pokemon-card-skeleton v-for="skeletonIdx in pageSize" :key="skeletonIdx" />
 		</div>
-		<div v-else ref="pokemon-list" class="h-auto lg:grid-cols-3 overflow-y-auto mb-5 sm:gap-4 sm:grid sm:grid-cols-2 sm:items-center sm:space-y-0 space-y-3 xl:grid-cols-4 rounded-2xl scrollable">
+		<div v-else ref="pokemon-list" class="flex-1 min-h-0 lg:grid-cols-3 overflow-y-auto mb-5 sm:gap-4 sm:grid sm:grid-cols-2 sm:items-center sm:space-y-0 space-y-3 xl:grid-cols-4 rounded-2xl scrollable">
 			<pokemon-card
 				v-for="pokemon in pokemonList"
 				:key="pokemon.id"
@@ -153,7 +153,9 @@
 <script setup lang="ts">
 import type { PokemonIndexEntry, PokemonFilters, PokemonCategory } from '~/types/pokemon-list';
 
-const PAGE_SIZE = 20;
+// h-24 card height; keep in sync with the card component
+const CARD_HEIGHT = 96;
+const MIN_PAGE_SIZE = 20;
 
 const pokemonStore = usePokemonStore();
 const route = useRoute();
@@ -171,8 +173,53 @@ const isSearching = ref(false);
 const filters = ref<PokemonFilters>({ types: [], generations: [], categories: [] });
 const isSidebarOpen = ref(false);
 const page = ref(0);
+// Cards per page — recalculated from the list container size so a page
+// always shows exactly the cards that fit without scrolling
+const pageSize = ref(20);
 // True only while the one-off GraphQL index loads
 const pending = ref(true);
+
+const calcPageSize = () => {
+	const el = pokemonListEl.value;
+	if (!el) {
+		return;
+	}
+	const styles = getComputedStyle(el);
+	const isGrid = styles.display === 'grid';
+	const columns = isGrid ? styles.gridTemplateColumns.split(' ').length : 1;
+	const gap = isGrid ? (parseFloat(styles.rowGap) || 16) : 12;
+	const rows = Math.max(1, Math.floor((el.clientHeight + gap) / (CARD_HEIGHT + gap)));
+	// At least 20 per page — smaller screens scroll within the list instead
+	pageSize.value = Math.max(MIN_PAGE_SIZE, columns * rows);
+};
+
+// Keep the current page in range when a resize changes the page count
+watch(pageSize, () => {
+	const maxPage = Math.max(0, Math.ceil(filteredList.value.length / pageSize.value) - 1);
+	if (page.value > maxPage) {
+		page.value = maxPage;
+	}
+});
+
+let resizeTimeout: ReturnType<typeof setTimeout> | undefined;
+const onResize = () => {
+	clearTimeout(resizeTimeout);
+	resizeTimeout = setTimeout(calcPageSize, 150);
+};
+
+onMounted(() => {
+	calcPageSize();
+	window.addEventListener('resize', onResize);
+});
+
+onActivated(() => {
+	calcPageSize();
+});
+
+onBeforeUnmount(() => {
+	clearTimeout(resizeTimeout);
+	window.removeEventListener('resize', onResize);
+});
 
 const activeFilterCount = computed(() => {
 	return filters.value.types.length + filters.value.generations.length + filters.value.categories.length;
@@ -219,7 +266,7 @@ const pokemonList = computed<PokemonIndexEntry[]>(() => {
 	if (isFiltering.value) {
 		return filteredList.value;
 	}
-	return filteredList.value.slice(page.value * PAGE_SIZE, (page.value + 1) * PAGE_SIZE);
+	return filteredList.value.slice(page.value * pageSize.value, (page.value + 1) * pageSize.value);
 });
 
 const hasPrevPage = computed(() => {
@@ -227,7 +274,7 @@ const hasPrevPage = computed(() => {
 });
 
 const hasNextPage = computed(() => {
-	return !isFiltering.value && (page.value + 1) * PAGE_SIZE < filteredList.value.length;
+	return !isFiltering.value && (page.value + 1) * pageSize.value < filteredList.value.length;
 });
 
 const scrollListToTop = () => {
