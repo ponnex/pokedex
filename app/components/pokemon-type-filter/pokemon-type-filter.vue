@@ -8,7 +8,7 @@
 				:aria-pressed="isActive(type)"
 				:title="`${capitalize(type)}`"
 				class="flex items-center shrink-0 gap-x-1 px-3 py-1.5 rounded-xl cursor-pointer transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:focus-visible:ring-white"
-				:class="isActive(type) ? [type, 'shadow-md'] : 'bg-gray-500 dark:bg-gray-700 hover:bg-gray-600 dark:hover:bg-gray-600'"
+				:class="[type, 'type-chip', { 'type-chip--active shadow-md': isActive(type) }]"
 				@click="toggleType(type)"
 			>
 				<img
@@ -72,5 +72,21 @@ const clearTypes = () => {
 <style lang="scss" scoped>
 .type-name {
 	font-size: 8px;
+}
+
+/*
+	Idle chips are a subtle neutral; the type color (from the global type
+	classes) shows through on hover and while active
+*/
+.type-chip:not(.type-chip--active):not(:hover) {
+	background: rgba(148, 163, 184, 0.22);
+
+	img {
+		filter: brightness(0) invert(0.55);
+	}
+
+	.type-name {
+		color: rgb(120, 130, 145);
+	}
 }
 </style>
