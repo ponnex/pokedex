@@ -4,3 +4,8 @@
 
 [build.environment]
   NODE_VERSION = "22"
+
+# Declaring the plugin here overrides the outdated UI-installed version
+# (which requires Node <20) with the latest release.
+[[plugins]]
+  package = "@netlify/plugin-lighthouse"
