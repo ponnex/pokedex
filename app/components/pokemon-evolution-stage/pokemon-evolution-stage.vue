@@ -56,7 +56,7 @@ const pokemonImage = (pokemon: string): string => {
 	if (!fetchedPokemon) {
 		return '';
 	}
-	return fetchedPokemon.sprites.other.officialArtwork.frontDefault;
+	return spriteUrl(fetchedPokemon.sprites.other.officialArtwork.frontDefault);
 };
 
 // Fetch on setup (replaces the Nuxt 2 non-blocking `fetch()` hook)

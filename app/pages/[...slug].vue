@@ -213,7 +213,7 @@ const pokemonEvolutionChain = computed(() => {
 });
 
 const pokemonImage = computed(() => {
-	return pokemon.value ? pokemon.value.sprites.other.officialArtwork.frontDefault : '';
+	return pokemon.value ? spriteUrl(pokemon.value.sprites.other.officialArtwork.frontDefault) : '';
 });
 
 // Fetch on setup (replaces the Nuxt 2 non-blocking `fetch()` hook)

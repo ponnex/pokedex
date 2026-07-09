@@ -25,11 +25,14 @@
 					/>
 				</svg>
 				<img
-					v-show="isImageLoaded"
+					v-if="pokemonImage()"
 					ref="pokemon-image"
 					class="h-24 2xl:h-auto p-2"
+					:class="{ 'absolute opacity-0': !isImageLoaded }"
 					:src="pokemonImage()"
 					:alt="pokemon.name"
+					loading="lazy"
+					decoding="async"
 					@load="onImageLoad()"
 				>
 			</div>
@@ -105,7 +108,7 @@ const varyingSkeletonNameWidth = computed<string>(() => {
 });
 
 const pokemonImage = () => {
-	return pokemonDetails.value ? pokemonDetails.value.sprites.other.officialArtwork.frontDefault : '';
+	return pokemonDetails.value ? spriteUrl(pokemonDetails.value.sprites.other.officialArtwork.frontDefault) : '';
 };
 
 const pokemonTypes = () => {
