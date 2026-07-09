@@ -41,12 +41,6 @@ export default defineNuxtConfig({
 		storageKey: 'nuxt-color-mode',
 	},
 
-	runtimeConfig: {
-		public: {
-			apiBase: 'https://pokeapi.co/api/v2',
-		},
-	},
-
 	compatibilityDate: '2026-07-09',
 
 	// Static generation: one route per Pokemon name (as the Nuxt 2 generate.routes)

@@ -1,42 +1,37 @@
 <template>
 	<div class="grid grid-cols-8">
 		<NuxtLink
-			:to="`/${evolutionStage.evolveFrom.species.name}`"
+			:to="`/${evolutionStage.evolveFrom.name}`"
 			class="col-span-3 h-28 justify-self-start self-center w-28 cursor-pointer"
 		>
 			<img
-				:src="pokemonImage(evolutionStage.evolveFrom.species.name)"
-				:alt="evolutionStage.evolveFrom.species.name"
+				:src="officialArtworkUrl(evolutionStage.evolveFrom.id)"
+				:alt="evolutionStage.evolveFrom.name"
 			>
 		</NuxtLink>
-		<div class="grid grid-rows-2 col-span-2 gap-y-2">
-			<span class="justify-self-center self-end text-xs" :class="`text-${pokemonColor}`">Level {{ evolutionStage.evolveTo.evolutionDetails[0]?.minLevel }}</span>
-			<div class="bg-gray-300 dark:bg-gray-600 h-1 rounded-sm"></div>
+		<div class="flex flex-col col-span-2 items-center justify-center gap-y-2">
+			<span class="px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-[10px] font-bold" :class="`text-${pokemonColor}`">{{ evolutionStage.minLevel ? `Lv. ${evolutionStage.minLevel}` : 'Evolves' }}</span>
+			<div class="bg-gray-200 dark:bg-gray-700 h-1 rounded-sm w-full"></div>
 		</div>
 		<NuxtLink
-			:to="`/${evolutionStage.evolveTo.species.name}`"
+			:to="`/${evolutionStage.evolveTo.name}`"
 			class="col-span-3 h-28 justify-self-start self-center w-28 cursor-pointer"
 		>
 			<img
-				:src="pokemonImage(evolutionStage.evolveTo.species.name)"
-				:alt="evolutionStage.evolveTo.species.name"
+				:src="officialArtworkUrl(evolutionStage.evolveTo.id)"
+				:alt="evolutionStage.evolveTo.name"
 			>
 		</NuxtLink>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { find } from 'lodash-es';
 import type { PropType } from 'vue';
-import type { EvolvesTo } from '~/types/pokemon-evolution-chain';
-import type { Pokemon } from '~/types/pokemon';
+import type { EvolutionStage } from '~/types/pokemon-details';
 
-interface EvolutionStage {
-	evolveFrom: EvolvesTo;
-	evolveTo: EvolvesTo;
-}
-
-const props = defineProps({
+// Purely presentational — species ids from the details GraphQL query build
+// the artwork URLs directly, so no per-stage REST fetch is needed
+defineProps({
 	evolutionStage: {
 		type: Object as PropType<EvolutionStage>,
 		default: () => { return {} as EvolutionStage; },
@@ -46,24 +41,4 @@ const props = defineProps({
 		default: '',
 	},
 });
-
-const pokemonStore = usePokemonStore();
-
-const pokemonImage = (pokemon: string): string => {
-	const fetchedPokemon: Pokemon | undefined = find(pokemonStore.pokemon, (fetchPokemon: Pokemon) => {
-		return fetchPokemon.name === pokemon;
-	});
-	if (!fetchedPokemon) {
-		return '';
-	}
-	return spriteUrl(fetchedPokemon.sprites.other.officialArtwork.frontDefault);
-};
-
-// Fetch on setup (replaces the Nuxt 2 non-blocking `fetch()` hook)
-const fetchStagePokemon = async() => {
-	await pokemonStore.getPokemon(props.evolutionStage.evolveFrom.species.name);
-	await pokemonStore.getPokemon(props.evolutionStage.evolveTo.species.name);
-};
-
-fetchStagePokemon();
 </script>
