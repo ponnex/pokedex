@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { filter, find, uniqBy } from 'lodash-es';
+import { filter, find, sortBy, uniqBy } from 'lodash-es';
 import type { PokemonListResponse, PokemonList } from '~/types/pokemon-list';
 import type { Pokemon } from '~/types/pokemon';
 import { ENDPOINTS } from '~/types/constants';
@@ -92,6 +92,39 @@ export const usePokemonStore = defineStore('pokemon', {
 				return;
 			}
 			return result;
+		},
+		async filterPokemonByTypes(types: string[], search?: string) {
+			try {
+				const typeResults = await Promise.all(types.map(async(type) => {
+					const cached = find(this.pokemonType, { name: type });
+					return cached ?? await this.getPokemonType(type);
+				}));
+				let results: PokemonList[] | undefined;
+				for (const typeResult of typeResults) {
+					if (!typeResult) {
+						continue;
+					}
+					const members = typeResult.pokemon.map(member => member.pokemon as PokemonList);
+					const memberNames = new Set(members.map(member => member.name));
+					results = results
+						? filter(results, (pokemon: PokemonList) => memberNames.has(pokemon.name))
+						: members;
+				}
+				results = results ?? [];
+				if (search) {
+					const regex = new RegExp(search, 'i');
+					results = filter(results, (pokemon: PokemonList) => regex.test(pokemon.name));
+				}
+				results = sortBy(results, (pokemon: PokemonList) => Number(idFromUrl(pokemon.url)));
+				const result = { results, count: results.length, previous: '', next: '' } as PokemonListResponse;
+				this.prevUrl = '';
+				this.nextUrl = '';
+				this.listResponse = result;
+				return result;
+			}
+			catch {
+				return;
+			}
 		},
 		async getPokemonSpecies(pokemon: string | number) {
 			let result;

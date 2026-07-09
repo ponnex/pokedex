@@ -63,6 +63,7 @@
 						@input="onSearchInput"
 					>
 				</div>
+				<pokemon-type-filter v-model="selectedTypes" @update:model-value="onTypesChange" />
 				<span class="block md:pt-4 lg:pt-4 font-medium text-xs text-gray-500 dark:text-white">The Pokédex contains detailed stats for every creature from the Pokémon games.</span>
 			</form>
 		</header>
@@ -145,6 +146,7 @@ const pokemonListEl = useTemplateRef<HTMLElement>('pokemon-list');
 
 const searchKey = ref('');
 const isSearching = ref(false);
+const selectedTypes = ref<string[]>([]);
 // Local pending state (replaces the Nuxt 2 `$fetchState.pending`)
 const pending = ref(true);
 
@@ -160,47 +162,70 @@ const prevUrl = computed(() => {
 	return pokemonStore.prevUrl;
 });
 
-// Fetch on setup (replaces the Nuxt 2 non-blocking `fetch()` hook)
-const fetchList = async() => {
+const scrollListToTop = () => {
+	pokemonListEl.value?.scrollTo(0, 0);
+};
+
+// Applies the current search + type filter state: syncs the URL query and
+// fetches through the matching store action (filter > search > plain list)
+const applyFilters = async() => {
 	pending.value = true;
-	const { search } = route.query;
-	if (search && (search as string).length >= 3) {
-		searchKey.value = search as string;
-		isSearching.value = true;
-		await pokemonStore.searchPokemon(search as string);
+	const search = searchKey.value.length >= 3 ? searchKey.value : '';
+	isSearching.value = !!search;
+	const query: Record<string, string> = {};
+	if (search) {
+		query.search = search;
+	}
+	if (selectedTypes.value.length) {
+		query.types = selectedTypes.value.join(',');
+	}
+	router.push({ path: '/', query });
+	if (selectedTypes.value.length) {
+		await pokemonStore.filterPokemonByTypes(selectedTypes.value, search || undefined);
+	}
+	else if (search) {
+		await pokemonStore.searchPokemon(search);
 	}
 	else {
-		router.push('/');
 		await pokemonStore.getListResponse();
 	}
 	pending.value = false;
+	scrollListToTop();
+};
+
+// Fetch on setup (replaces the Nuxt 2 non-blocking `fetch()` hook)
+const fetchList = async() => {
+	const { search, types } = route.query;
+	if (search && (search as string).length >= 3) {
+		searchKey.value = search as string;
+	}
+	if (typeof types === 'string' && types) {
+		selectedTypes.value = types.split(',');
+	}
+	await applyFilters();
 };
 
 fetchList();
 
 const onSearchSubmit = () => {
 	if (searchKey.value !== '' && searchKey.value.length >= 3) {
-		router.push(`/?search=${searchKey.value}`);
-		pokemonStore.searchPokemon(searchKey.value);
+		applyFilters();
 	}
 };
 
 const onSearchInput = () => {
-	const { search } = route.query;
-	if (searchKey.value === '' && search) {
-		router.push('/');
-		isSearching.value = false;
-		pokemonStore.getListResponse();
+	if (searchKey.value === '' && isSearching.value) {
+		applyFilters();
 	}
 };
 
 const backFromSearch = () => {
 	searchKey.value = '';
-	onSearchInput();
+	applyFilters();
 };
 
-const scrollListToTop = () => {
-	pokemonListEl.value?.scrollTo(0, 0);
+const onTypesChange = () => {
+	applyFilters();
 };
 
 const prevPage = async() => {
