@@ -34,7 +34,7 @@
 						<path v-if="colorMode.preference == 'dark'" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
 					</svg>
 				</div>
-				<div class="space-x-6">
+				<div class="flex items-center gap-x-4">
 					<svg
 						v-if="isSearching"
 						width="22"
@@ -42,7 +42,7 @@
 						viewBox="0 0 22 14"
 						fill="none"
 						xmlns="http://www.w3.org/2000/svg"
-						class="inline-block col-span-11 cursor-pointer"
+						class="shrink-0 cursor-pointer"
 						@click="backFromSearch()"
 					>
 						<path
@@ -58,12 +58,30 @@
 						name="search-pokemon"
 						placeholder="Search for a Pokémon"
 						autocomplete="off"
-						:class="[{'min-w-full': !isSearching}, {'w-10/12': isSearching}]"
-						class="inline-block font-medium text-gray-500 dark:text-black placeholder-gray-500 dark:placeholder-gray-900 bg-gray-200 dark:bg-gray-50 rounded-2xl py-1 px-3"
+						class="flex-1 min-w-0 font-medium text-gray-500 dark:text-black placeholder-gray-500 dark:placeholder-gray-900 bg-gray-200 dark:bg-gray-50 rounded-2xl py-1 px-3"
 						@input="onSearchInput"
 					>
+					<button
+						type="button"
+						aria-label="Open filters"
+						class="relative shrink-0 flex items-center gap-x-1.5 px-3 py-1.5 rounded-2xl cursor-pointer text-sm font-medium text-gray-600 dark:text-white bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:focus-visible:ring-white"
+						@click="isSidebarOpen = true"
+					>
+						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+							<line x1="4" y1="6" x2="20" y2="6" />
+							<line x1="7" y1="12" x2="17" y2="12" />
+							<line x1="10" y1="18" x2="14" y2="18" />
+						</svg>
+						Filters
+						<span
+							v-if="activeFilterCount"
+							class="flex items-center justify-center h-4 min-w-4 px-1 rounded-full bg-red-600 text-white text-[10px] font-bold"
+						>
+							{{ activeFilterCount }}
+						</span>
+					</button>
 				</div>
-				<pokemon-type-filter v-model="selectedTypes" @update:model-value="onTypesChange" />
+				<pokemon-active-filters v-model="filters" @update:model-value="onFiltersChange" />
 				<span class="block md:pt-4 lg:pt-4 font-medium text-xs text-gray-500 dark:text-white">The Pokédex contains detailed stats for every creature from the Pokémon games.</span>
 			</form>
 		</header>
@@ -126,11 +144,17 @@
 				</svg>
 			</div>
 		</div>
+		<pokemon-filter-sidebar
+			v-model="filters"
+			:open="isSidebarOpen"
+			@update:model-value="onFiltersChange"
+			@close="isSidebarOpen = false"
+		/>
 	</div>
 </template>
 
 <script setup lang="ts">
-import type { PokemonIndexEntry } from '~/types/pokemon-list';
+import type { PokemonIndexEntry, PokemonFilters, PokemonCategory } from '~/types/pokemon-list';
 
 const PAGE_SIZE = 20;
 
@@ -147,16 +171,39 @@ const searchKey = ref('');
 // The applied search term (set on submit/deep-link, not on every keystroke)
 const activeSearch = ref('');
 const isSearching = ref(false);
-const selectedTypes = ref<string[]>([]);
+const filters = ref<PokemonFilters>({ types: [], generations: [], categories: [] });
+const isSidebarOpen = ref(false);
 const page = ref(0);
 // True only while the one-off GraphQL index loads
 const pending = ref(true);
 
-// Everything below derives from the in-memory index — no API calls involved
+const activeFilterCount = computed(() => {
+	return filters.value.types.length + filters.value.generations.length + filters.value.categories.length;
+});
+
+// Everything below derives from the in-memory index — no API calls involved.
+// Types combine as AND (dual-type match); generations and categories as OR.
 const filteredList = computed<PokemonIndexEntry[]>(() => {
 	let list = pokemonStore.pokemonIndex;
-	if (selectedTypes.value.length) {
-		list = list.filter(pokemon => selectedTypes.value.every(type => pokemon.types.includes(type)));
+	const { types, generations, categories } = filters.value;
+	if (types.length) {
+		list = list.filter(pokemon => types.every(type => pokemon.types.includes(type)));
+	}
+	if (generations.length) {
+		list = list.filter(pokemon => generations.includes(pokemon.generation));
+	}
+	if (categories.length) {
+		list = list.filter((pokemon) => {
+			return categories.some((category) => {
+				if (category === 'legendary') {
+					return pokemon.isLegendary;
+				}
+				if (category === 'mythical') {
+					return pokemon.isMythical;
+				}
+				return pokemon.isBaby;
+			});
+		});
 	}
 	if (activeSearch.value) {
 		const regex = new RegExp(activeSearch.value, 'i');
@@ -167,7 +214,7 @@ const filteredList = computed<PokemonIndexEntry[]>(() => {
 
 // Search/filter results show all at once; only the plain list paginates
 const isFiltering = computed(() => {
-	return isSearching.value || selectedTypes.value.length > 0;
+	return isSearching.value || activeFilterCount.value > 0;
 });
 
 const pokemonList = computed<PokemonIndexEntry[]>(() => {
@@ -189,7 +236,7 @@ const scrollListToTop = () => {
 	pokemonListEl.value?.scrollTo(0, 0);
 };
 
-// Applies the current search + type filter state and syncs the URL query
+// Applies the current search + filter state and syncs the URL query
 const applyFilters = () => {
 	const search = searchKey.value.length >= 3 ? searchKey.value : '';
 	activeSearch.value = search;
@@ -199,8 +246,14 @@ const applyFilters = () => {
 	if (search) {
 		query.search = search;
 	}
-	if (selectedTypes.value.length) {
-		query.types = selectedTypes.value.join(',');
+	if (filters.value.types.length) {
+		query.types = filters.value.types.join(',');
+	}
+	if (filters.value.generations.length) {
+		query.gens = filters.value.generations.join(',');
+	}
+	if (filters.value.categories.length) {
+		query.cats = filters.value.categories.join(',');
 	}
 	router.push({ path: '/', query });
 	scrollListToTop();
@@ -208,14 +261,22 @@ const applyFilters = () => {
 
 // Fetch on setup (replaces the Nuxt 2 non-blocking `fetch()` hook)
 const fetchList = async() => {
-	const { search, types } = route.query;
+	const { search, types, gens, cats } = route.query;
 	if (search && (search as string).length >= 3) {
 		searchKey.value = search as string;
 		activeSearch.value = search as string;
 		isSearching.value = true;
 	}
 	if (typeof types === 'string' && types) {
-		selectedTypes.value = types.split(',');
+		filters.value.types = types.split(',');
+	}
+	if (typeof gens === 'string' && gens) {
+		filters.value.generations = gens.split(',').map(Number).filter(Boolean);
+	}
+	if (typeof cats === 'string' && cats) {
+		filters.value.categories = cats.split(',').filter((category) => {
+			return [ 'legendary', 'mythical', 'baby' ].includes(category);
+		}) as PokemonCategory[];
 	}
 	await pokemonStore.getPokemonIndex();
 	pending.value = false;
@@ -240,7 +301,8 @@ const backFromSearch = () => {
 	applyFilters();
 };
 
-const onTypesChange = () => {
+const onFiltersChange = (updated: PokemonFilters) => {
+	filters.value = updated;
 	applyFilters();
 };
 

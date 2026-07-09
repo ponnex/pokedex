@@ -42,7 +42,7 @@ export const usePokemonStore = defineStore('pokemon', {
 				const response = await $fetch<PokemonIndexResponse>(GRAPHQL_API, {
 					method: 'POST',
 					body: {
-						query: '{ pokemon(order_by: {id: asc}) { id name pokemontypes { type { name } } pokemonspecy { pokemoncolor { name } } } }',
+						query: '{ pokemon(order_by: {id: asc}) { id name pokemontypes { type { name } } pokemonspecy { generation_id is_legendary is_mythical is_baby pokemoncolor { name } } } }',
 					},
 				});
 				this.pokemonIndex = response.data.pokemon.map(pokemon => ({
@@ -50,6 +50,10 @@ export const usePokemonStore = defineStore('pokemon', {
 					name: pokemon.name,
 					types: pokemon.pokemontypes.map(pokemonType => pokemonType.type.name),
 					color: pokemon.pokemonspecy?.pokemoncolor?.name ?? '',
+					generation: pokemon.pokemonspecy?.generation_id ?? 0,
+					isLegendary: pokemon.pokemonspecy?.is_legendary ?? false,
+					isMythical: pokemon.pokemonspecy?.is_mythical ?? false,
+					isBaby: pokemon.pokemonspecy?.is_baby ?? false,
 				}));
 				return this.pokemonIndex;
 			}
