@@ -85,24 +85,60 @@
 				<span class="block md:pt-4 lg:pt-4 font-medium text-xs text-gray-500 dark:text-white">The Pokédex contains detailed stats for every creature from the Pokémon games.</span>
 			</form>
 		</header>
-		<div v-if="pending" ref="pokemon-list" class="flex-1 min-h-0 lg:grid-cols-3 overflow-y-auto mb-5 sm:gap-4 sm:grid sm:grid-cols-2 sm:items-center sm:space-y-0 space-y-3 xl:grid-cols-4 rounded-2xl scrollable">
+		<div v-if="pending" ref="pokemon-list" class="flex-1 min-h-0 lg:grid-cols-3 overflow-y-auto mb-5 sm:gap-4 sm:grid sm:grid-cols-2 sm:content-start sm:items-center sm:space-y-0 space-y-3 xl:grid-cols-4 rounded-2xl scrollable">
 			<pokemon-card-skeleton v-for="skeletonIdx in pageSize" :key="skeletonIdx" />
 		</div>
-		<div v-else ref="pokemon-list" class="flex-1 min-h-0 lg:grid-cols-3 overflow-y-auto mb-5 sm:gap-4 sm:grid sm:grid-cols-2 sm:items-center sm:space-y-0 space-y-3 xl:grid-cols-4 rounded-2xl scrollable">
+		<div v-else ref="pokemon-list" class="flex-1 min-h-0 lg:grid-cols-3 overflow-y-auto mb-5 sm:gap-4 sm:grid sm:grid-cols-2 sm:content-start sm:items-center sm:space-y-0 space-y-3 xl:grid-cols-4 rounded-2xl scrollable">
 			<pokemon-card
 				v-for="pokemon in pokemonList"
 				:key="pokemon.id"
 				:pokemon="pokemon"
 				@click="onSelectPokemon(pokemon)"
 			/>
-			<div v-if="!pokemonList.length" class="grid justify-center space-y-4">
-				<span>No Pokémon found</span>
-				<button
-					class="border-2 border-gray-300 p-1 px-2 rounded-xl text-sm"
-					@click="onFocusSearch()"
+			<div v-if="!pokemonList.length" class="col-span-full flex flex-col items-center justify-center text-center gap-y-2 py-20 px-6">
+				<svg
+					class="h-16 w-16 text-gray-300 dark:text-gray-600 mb-2"
+					viewBox="0 0 104 104"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+					aria-hidden="true"
 				>
-					Search Again
-				</button>
+					<circle cx="52" cy="52" r="17" fill="currentColor" />
+					<path
+						fill-rule="evenodd"
+						clip-rule="evenodd"
+						d="M78.3309 58H103.658C100.683 83.8926 78.6896 104 52 104C25.3104 104 3.3172 83.8926 0.342407 58H25.669C28.3974 70.0239 39.1505 79 52 79C64.8495 79 75.6026 70.0239 78.3309 58ZM78.3309 46H103.658C100.683 20.1074 78.6896 0 52 0C25.3104 0 3.3172 20.1074 0.342407 46H25.669C28.3974 33.9761 39.1505 25 52 25C64.8495 25 75.6026 33.9761 78.3309 46Z"
+						fill="currentColor"
+					/>
+				</svg>
+				<span class="text-lg font-semibold text-gray-700 dark:text-white">No Pokémon found</span>
+				<span class="text-sm text-gray-500 dark:text-gray-400 max-w-xs">{{ emptyStateMessage }}</span>
+				<div class="flex flex-wrap justify-center gap-3 mt-3">
+					<button
+						v-if="activeFilterCount"
+						type="button"
+						class="px-4 py-1.5 rounded-xl cursor-pointer text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
+						@click="onFiltersChange({ types: [], generations: [], categories: [], moves: [] })"
+					>
+						Clear filters
+					</button>
+					<button
+						v-if="isSearching"
+						type="button"
+						class="px-4 py-1.5 rounded-xl cursor-pointer text-sm font-medium text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
+						@click="backFromSearch()"
+					>
+						Clear search
+					</button>
+					<button
+						v-if="!isSearching && !activeFilterCount"
+						type="button"
+						class="px-4 py-1.5 rounded-xl cursor-pointer text-sm font-medium text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
+						@click="onFocusSearch()"
+					>
+						Search again
+					</button>
+				</div>
 			</div>
 		</div>
 		<div class="min-w-full bottom-0 fixed grid grid-cols-2 h-10 justify-self-center self-center gap-x-20 bg-white dark:bg-gray-900">
@@ -170,7 +206,7 @@ const searchKey = ref('');
 // The applied search term (set on submit/deep-link, not on every keystroke)
 const activeSearch = ref('');
 const isSearching = ref(false);
-const filters = ref<PokemonFilters>({ types: [], generations: [], categories: [] });
+const filters = ref<PokemonFilters>({ types: [], generations: [], categories: [], moves: [] });
 const isSidebarOpen = ref(false);
 const page = ref(0);
 // Cards per page — recalculated from the list container size so a page
@@ -222,15 +258,27 @@ onBeforeUnmount(() => {
 });
 
 const activeFilterCount = computed(() => {
-	return filters.value.types.length + filters.value.generations.length + filters.value.categories.length;
+	return filters.value.types.length + filters.value.generations.length
+		+ filters.value.categories.length + filters.value.moves.length;
 });
 
-// Everything below derives from the in-memory index — no API calls involved.
-// All filter groups combine as OR within the group: a Pokemon matches when
-// it has any of the selected types / generations / categories.
+// Ids of Pokemon learning the selected moves are fetched per move and cached
+const ensureMovePokemonIds = () => {
+	filters.value.moves.forEach((move) => {
+		pokemonStore.getMovePokemonIds(move);
+	});
+};
+
+// Everything below derives from the in-memory index; only newly selected
+// moves trigger one cached GraphQL query each. All filter groups combine as
+// OR within the group: a Pokemon matches any selected value.
 const filteredList = computed<PokemonIndexEntry[]>(() => {
 	let list = pokemonStore.pokemonIndex;
-	const { types, generations, categories } = filters.value;
+	const { types, generations, categories, moves } = filters.value;
+	if (moves.length) {
+		const learnerIds = new Set(moves.flatMap(move => pokemonStore.movePokemonIds[move] ?? []));
+		list = list.filter(pokemon => learnerIds.has(pokemon.id));
+	}
 	if (types.length) {
 		list = list.filter(pokemon => types.some(type => pokemon.types.includes(type)));
 	}
@@ -277,6 +325,19 @@ const hasNextPage = computed(() => {
 	return !isFiltering.value && (page.value + 1) * pageSize.value < filteredList.value.length;
 });
 
+const emptyStateMessage = computed(() => {
+	if (activeSearch.value && activeFilterCount.value) {
+		return `Nothing matches “${activeSearch.value}” with the current filters. Try loosening one of them.`;
+	}
+	if (activeSearch.value) {
+		return `Nothing matches “${activeSearch.value}”. Check the spelling or try a shorter name.`;
+	}
+	if (activeFilterCount.value) {
+		return 'No Pokémon matches this filter combination. Try removing a filter.';
+	}
+	return 'Try searching for a Pokémon by name.';
+});
+
 const scrollListToTop = () => {
 	pokemonListEl.value?.scrollTo(0, 0);
 };
@@ -300,13 +361,17 @@ const applyFilters = () => {
 	if (filters.value.categories.length) {
 		query.cats = filters.value.categories.join(',');
 	}
+	if (filters.value.moves.length) {
+		query.moves = filters.value.moves.join(',');
+	}
+	ensureMovePokemonIds();
 	router.push({ path: '/', query });
 	scrollListToTop();
 };
 
 // Fetch on setup (replaces the Nuxt 2 non-blocking `fetch()` hook)
 const fetchList = async() => {
-	const { search, types, gens, cats } = route.query;
+	const { search, types, gens, cats, moves } = route.query;
 	if (search && (search as string).length >= 3) {
 		searchKey.value = search as string;
 		activeSearch.value = search as string;
@@ -323,6 +388,10 @@ const fetchList = async() => {
 			return [ 'legendary', 'mythical', 'baby' ].includes(category);
 		}) as PokemonCategory[];
 	}
+	if (typeof moves === 'string' && moves) {
+		filters.value.moves = moves.split(',');
+		ensureMovePokemonIds();
+	}
 	await pokemonStore.getPokemonIndex();
 	pending.value = false;
 };
@@ -330,15 +399,21 @@ const fetchList = async() => {
 fetchList();
 
 const onSearchSubmit = () => {
+	clearTimeout(searchTimeout);
 	if (searchKey.value !== '' && searchKey.value.length >= 3) {
 		applyFilters();
 	}
 };
 
+// Live search: apply as the user types (debounced), not only on Enter
+let searchTimeout: ReturnType<typeof setTimeout> | undefined;
 const onSearchInput = () => {
-	if (searchKey.value === '' && isSearching.value) {
-		applyFilters();
-	}
+	clearTimeout(searchTimeout);
+	searchTimeout = setTimeout(() => {
+		if (searchKey.value.length >= 3 || (searchKey.value === '' && isSearching.value)) {
+			applyFilters();
+		}
+	}, 250);
 };
 
 const backFromSearch = () => {

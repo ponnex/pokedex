@@ -65,6 +65,43 @@
 						</div>
 					</section>
 					<section>
+						<h3 class="text-xs font-bold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-2">Moves</h3>
+						<input
+							v-model="moveSearch"
+							type="search"
+							placeholder="Search moves"
+							autocomplete="off"
+							aria-label="Search moves"
+							class="w-full font-medium text-sm text-gray-600 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 bg-gray-100 dark:bg-gray-800 rounded-xl py-1.5 px-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:focus-visible:ring-white"
+						>
+						<div v-if="moveSuggestions.length" class="mt-2 flex flex-wrap gap-2">
+							<button
+								v-for="move in moveSuggestions"
+								:key="move"
+								type="button"
+								class="px-3 py-1.5 rounded-xl cursor-pointer text-xs font-bold bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:focus-visible:ring-white"
+								@click="addMove(move)"
+							>
+								{{ startCase(move) }}
+							</button>
+						</div>
+						<div v-if="modelValue.moves.length" class="mt-2 flex flex-wrap gap-2">
+							<button
+								v-for="move in modelValue.moves"
+								:key="move"
+								type="button"
+								:aria-label="`Remove ${startCase(move)} move filter`"
+								class="flex items-center gap-x-1.5 px-3 py-1.5 rounded-xl cursor-pointer text-xs font-bold bg-red-600 text-white shadow-md hover:opacity-80 transition-opacity duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:focus-visible:ring-white"
+								@click="removeMove(move)"
+							>
+								{{ startCase(move) }}
+								<svg width="8" height="8" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+									<path d="M1 1L9 9M9 1L1 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+								</svg>
+							</button>
+						</div>
+					</section>
+					<section>
 						<h3 class="text-xs font-bold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-2">Category</h3>
 						<div class="flex flex-wrap gap-2" role="group" aria-label="Filter by category">
 							<button
@@ -89,6 +126,7 @@
 </template>
 
 <script setup lang="ts">
+import { startCase } from 'lodash-es';
 import type { PropType } from 'vue';
 import type { PokemonFilters, PokemonCategory } from '~/types/pokemon-list';
 
@@ -117,7 +155,7 @@ const props = defineProps({
 	},
 	modelValue: {
 		type: Object as PropType<PokemonFilters>,
-		default: () => { return { types: [], generations: [], categories: [] } as PokemonFilters; },
+		default: () => { return { types: [], generations: [], categories: [], moves: [] } as PokemonFilters; },
 	},
 });
 
@@ -126,10 +164,41 @@ const emit = defineEmits<{
 	close: [];
 }>();
 
+const pokemonStore = usePokemonStore();
+
+const moveSearch = ref('');
+
+// Load the move-name list the first time the sidebar opens
+watch(() => props.open, (open) => {
+	if (open) {
+		pokemonStore.getMoveNames();
+	}
+}, { immediate: true });
+
+const moveSuggestions = computed(() => {
+	const search = moveSearch.value.trim().toLowerCase();
+	if (search.length < 2) {
+		return [];
+	}
+	return pokemonStore.moveNames
+		.filter(move => move.includes(search) && !props.modelValue.moves.includes(move))
+		.slice(0, 8);
+});
+
+const addMove = (move: string) => {
+	updateFilters({ moves: [ ...props.modelValue.moves, move ] });
+	moveSearch.value = '';
+};
+
+const removeMove = (move: string) => {
+	updateFilters({ moves: props.modelValue.moves.filter(active => active !== move) });
+};
+
 const hasActiveFilters = computed(() => {
 	return props.modelValue.types.length > 0
 		|| props.modelValue.generations.length > 0
-		|| props.modelValue.categories.length > 0;
+		|| props.modelValue.categories.length > 0
+		|| props.modelValue.moves.length > 0;
 });
 
 const updateFilters = (partial: Partial<PokemonFilters>) => {
@@ -151,7 +220,7 @@ const toggleCategory = (category: PokemonCategory) => {
 };
 
 const clearAll = () => {
-	emit('update:modelValue', { types: [], generations: [], categories: [] });
+	emit('update:modelValue', { types: [], generations: [], categories: [], moves: [] });
 };
 
 const onKeydown = (event: KeyboardEvent) => {

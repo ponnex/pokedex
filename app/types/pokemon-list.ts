@@ -22,6 +22,21 @@ export interface PokemonFilters {
   types: string[];
   generations: number[];
   categories: PokemonCategory[];
+  moves: string[];
+}
+
+export interface MoveNamesResponse {
+  data: {
+    move: { name: string }[];
+  };
+}
+
+export interface MovePokemonResponse {
+  data: {
+    move: {
+      pokemonmoves: { pokemon_id: number }[];
+    }[];
+  };
 }
 
 export interface PokemonIndexResponse {

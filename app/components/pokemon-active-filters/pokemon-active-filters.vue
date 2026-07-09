@@ -46,9 +46,22 @@
 			</svg>
 		</button>
 		<button
+			v-for="move in modelValue.moves"
+			:key="`move-${move}`"
+			type="button"
+			:aria-label="`Remove ${startCase(move)} move filter`"
+			class="flex items-center shrink-0 h-7 gap-x-1.5 px-3 rounded-xl cursor-pointer bg-blue-600 shadow-sm transition-opacity duration-200 hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:focus-visible:ring-white"
+			@click="removeMove(move)"
+		>
+			<span class="pill-label font-bold text-white">{{ upperCase(move) }}</span>
+			<svg class="text-white" width="8" height="8" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+				<path d="M1 1L9 9M9 1L1 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+			</svg>
+		</button>
+		<button
 			type="button"
 			class="flex items-center shrink-0 h-7 px-3 rounded-xl cursor-pointer text-xs font-medium text-gray-500 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:focus-visible:ring-white"
-			@click="emit('update:modelValue', { types: [], generations: [], categories: [] })"
+			@click="emit('update:modelValue', { types: [], generations: [], categories: [], moves: [] })"
 		>
 			Clear all
 		</button>
@@ -56,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { upperCase, capitalize } from 'lodash-es';
+import { upperCase, capitalize, startCase } from 'lodash-es';
 import type { PropType } from 'vue';
 import type { PokemonFilters, PokemonCategory } from '~/types/pokemon-list';
 
@@ -65,7 +78,7 @@ const ROMAN = [ 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX' ];
 const props = defineProps({
 	modelValue: {
 		type: Object as PropType<PokemonFilters>,
-		default: () => { return { types: [], generations: [], categories: [] } as PokemonFilters; },
+		default: () => { return { types: [], generations: [], categories: [], moves: [] } as PokemonFilters; },
 	},
 });
 
@@ -74,7 +87,8 @@ const emit = defineEmits<{ 'update:modelValue': [filters: PokemonFilters] }>();
 const hasActiveFilters = computed(() => {
 	return props.modelValue.types.length > 0
 		|| props.modelValue.generations.length > 0
-		|| props.modelValue.categories.length > 0;
+		|| props.modelValue.categories.length > 0
+		|| props.modelValue.moves.length > 0;
 });
 
 const removeType = (type: string) => {
@@ -95,6 +109,13 @@ const removeCategory = (category: PokemonCategory) => {
 	emit('update:modelValue', {
 		...props.modelValue,
 		categories: props.modelValue.categories.filter((active) => { return active !== category; }),
+	});
+};
+
+const removeMove = (move: string) => {
+	emit('update:modelValue', {
+		...props.modelValue,
+		moves: props.modelValue.moves.filter((active) => { return active !== move; }),
 	});
 };
 </script>
