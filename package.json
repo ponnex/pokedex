@@ -2,6 +2,9 @@
   "name": "pokedex",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "clean": "rimraf dist .output .nuxt",
     "dev": "cross-env HOST=0.0.0.0 nuxt dev",
