@@ -141,41 +141,59 @@
 				</div>
 			</div>
 		</div>
-		<div class="min-w-full bottom-0 fixed grid grid-cols-2 h-10 justify-self-center self-center gap-x-20 bg-white dark:bg-gray-900">
-			<div class="h-full w-full grid-cols-1 justify-self-center self-center">
-				<svg
-					v-if="hasPrevPage"
-					width="22"
-					height="14"
-					viewBox="0 0 22 14"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-full m-auto cursor-pointer"
+		<div class="min-w-full bottom-0 fixed flex h-10 items-center justify-center gap-x-8 bg-white dark:bg-gray-900 text-gray-700 dark:text-white">
+			<template v-if="!isFiltering">
+				<button
+					type="button"
+					aria-label="Previous page"
+					:disabled="!hasPrevPage"
+					class="flex items-center justify-center h-full px-4 transition-opacity duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:focus-visible:ring-white"
+					:class="hasPrevPage ? 'cursor-pointer hover:opacity-60' : 'opacity-20 cursor-default'"
 					@click="prevPage()"
 				>
-					<path
-						d="M7.70711 1.70711C8.09763 1.31658 8.09763 0.683417 7.70711 0.292893C7.31658 -0.0976311 6.68342 -0.0976311 6.29289 0.292893L0.292893 6.29289C-0.097631 6.68342 -0.097631 7.31658 0.292893 7.70711L6.29289 13.7071C6.68342 14.0976 7.31658 14.0976 7.70711 13.7071C8.09763 13.3166 8.09763 12.6834 7.70711 12.2929L3.4142 7.99998H20.9892C21.5476 7.99998 22.0002 7.55227 22.0002 6.99998C22.0002 6.4477 21.5476 5.99998 20.9892 5.99998H3.41423L7.70711 1.70711Z"
-						fill="currentColor"
-					/>
-				</svg>
-			</div>
-			<div class="h-full w-full grid-cols-1 justify-self-center self-center">
-				<svg
-					v-if="hasNextPage"
-					width="22"
-					height="14"
-					viewBox="0 0 22 14"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-full m-auto cursor-pointer"
+					<svg
+						width="22"
+						height="14"
+						viewBox="0 0 22 14"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+						aria-hidden="true"
+					>
+						<path
+							d="M7.70711 1.70711C8.09763 1.31658 8.09763 0.683417 7.70711 0.292893C7.31658 -0.0976311 6.68342 -0.0976311 6.29289 0.292893L0.292893 6.29289C-0.097631 6.68342 -0.097631 7.31658 0.292893 7.70711L6.29289 13.7071C6.68342 14.0976 7.31658 14.0976 7.70711 13.7071C8.09763 13.3166 8.09763 12.6834 7.70711 12.2929L3.4142 7.99998H20.9892C21.5476 7.99998 22.0002 7.55227 22.0002 6.99998C22.0002 6.4477 21.5476 5.99998 20.9892 5.99998H3.41423L7.70711 1.70711Z"
+							fill="currentColor"
+						/>
+					</svg>
+				</button>
+				<span class="text-xs font-medium text-gray-500 dark:text-gray-300 tabular-nums" aria-live="polite">
+					Page {{ page + 1 }} of {{ totalPages }}
+				</span>
+				<button
+					type="button"
+					aria-label="Next page"
+					:disabled="!hasNextPage"
+					class="flex items-center justify-center h-full px-4 transition-opacity duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:focus-visible:ring-white"
+					:class="hasNextPage ? 'cursor-pointer hover:opacity-60' : 'opacity-20 cursor-default'"
 					@click="nextPage()"
 				>
-					<path
-						d="M14.2931 1.70711C13.9026 1.31658 13.9026 0.683417 14.2931 0.292893C14.6837 -0.0976311 15.3168 -0.0976311 15.7074 0.292893L21.7073 6.29289C22.0979 6.68342 22.0979 7.31658 21.7073 7.70711L15.7074 13.7071C15.3168 14.0976 14.6837 14.0976 14.2931 13.7071C13.9026 13.3166 13.9026 12.6834 14.2931 12.2929L18.586 7.99998H1.01103C0.452653 7.99998 0 7.55227 0 6.99998C0 6.4477 0.452653 5.99998 1.01103 5.99998H18.586L14.2931 1.70711Z"
-						fill="currentColor"
-					/>
-				</svg>
-			</div>
+					<svg
+						width="22"
+						height="14"
+						viewBox="0 0 22 14"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+						aria-hidden="true"
+					>
+						<path
+							d="M14.2931 1.70711C13.9026 1.31658 13.9026 0.683417 14.2931 0.292893C14.6837 -0.0976311 15.3168 -0.0976311 15.7074 0.292893L21.7073 6.29289C22.0979 6.68342 22.0979 7.31658 21.7073 7.70711L15.7074 13.7071C15.3168 14.0976 14.6837 14.0976 14.2931 13.7071C13.9026 13.3166 13.9026 12.6834 14.2931 12.2929L18.586 7.99998H1.01103C0.452653 7.99998 0 7.55227 0 6.99998C0 6.4477 0.452653 5.99998 1.01103 5.99998H18.586L14.2931 1.70711Z"
+							fill="currentColor"
+						/>
+					</svg>
+				</button>
+			</template>
+			<span v-else class="text-xs font-medium text-gray-500 dark:text-gray-300 tabular-nums">
+				{{ filteredList.length }} Pokémon found
+			</span>
 		</div>
 		<pokemon-filter-sidebar
 			v-model="filters"
@@ -243,9 +261,24 @@ const onResize = () => {
 	resizeTimeout = setTimeout(calcPageSize, 150);
 };
 
+// Arrow keys page through the list unless the user is typing in a field
+const onKeydown = (event: KeyboardEvent) => {
+	const target = event.target as HTMLElement | null;
+	if (target && [ 'INPUT', 'TEXTAREA', 'SELECT' ].includes(target.tagName)) {
+		return;
+	}
+	if (event.key === 'ArrowLeft' && hasPrevPage.value) {
+		prevPage();
+	}
+	else if (event.key === 'ArrowRight' && hasNextPage.value) {
+		nextPage();
+	}
+};
+
 onMounted(() => {
 	calcPageSize();
 	window.addEventListener('resize', onResize);
+	window.addEventListener('keydown', onKeydown);
 });
 
 onActivated(() => {
@@ -255,6 +288,7 @@ onActivated(() => {
 onBeforeUnmount(() => {
 	clearTimeout(resizeTimeout);
 	window.removeEventListener('resize', onResize);
+	window.removeEventListener('keydown', onKeydown);
 });
 
 const activeFilterCount = computed(() => {
@@ -315,6 +349,10 @@ const pokemonList = computed<PokemonIndexEntry[]>(() => {
 		return filteredList.value;
 	}
 	return filteredList.value.slice(page.value * pageSize.value, (page.value + 1) * pageSize.value);
+});
+
+const totalPages = computed(() => {
+	return Math.max(1, Math.ceil(filteredList.value.length / pageSize.value));
 });
 
 const hasPrevPage = computed(() => {
