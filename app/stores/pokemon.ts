@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { uniqBy } from 'lodash-es';
-import type { MoveNamesResponse, MovePokemonResponse, PokemonIndexEntry, PokemonIndexResponse } from '~/types/pokemon-list';
+import type { MoveIndexEntry, MoveNamesResponse, MovePokemonResponse, PokemonIndexEntry, PokemonIndexResponse } from '~/types/pokemon-list';
 import { GRAPHQL_API } from '~/types/constants';
 import type { DamageRelationEntry, EvolutionStage, PokemonDetails, PokemonDetailsResponse } from '~/types/pokemon-details';
 
@@ -101,7 +101,7 @@ export const usePokemonStore = defineStore('pokemon', {
 	state: () => ({
 		pokemonIndex: [] as PokemonIndexEntry[],
 		pokemonDetails: {} as Record<string, PokemonDetails>,
-		moveNames: [] as string[],
+		moveIndex: [] as MoveIndexEntry[],
 		movePokemonIds: {} as Record<string, number[]>,
 	}),
 	actions: {
@@ -134,20 +134,24 @@ export const usePokemonStore = defineStore('pokemon', {
 				return;
 			}
 		},
-		// Full move-name list for the sidebar autocomplete (~900 names, one query)
-		async getMoveNames() {
-			if (this.moveNames.length) {
-				return this.moveNames;
+		// Full move list with damage class for the sidebar category browser
+		// (~900 entries, one query)
+		async getMoveIndex() {
+			if (this.moveIndex.length) {
+				return this.moveIndex;
 			}
 			try {
 				const response = await $fetch<MoveNamesResponse>(GRAPHQL_API, {
 					method: 'POST',
 					body: {
-						query: '{ move(order_by: {name: asc}) { name } }',
+						query: '{ move(order_by: {name: asc}) { name movedamageclass { name } } }',
 					},
 				});
-				this.moveNames = response.data.move.map(move => move.name);
-				return this.moveNames;
+				this.moveIndex = response.data.move.map(move => ({
+					name: move.name,
+					damageClass: move.movedamageclass?.name ?? '',
+				}));
+				return this.moveIndex;
 			}
 			catch {
 				return;

@@ -25,9 +25,17 @@ export interface PokemonFilters {
   moves: string[];
 }
 
+export interface MoveIndexEntry {
+  name: string;
+  damageClass: string;
+}
+
 export interface MoveNamesResponse {
   data: {
-    move: { name: string }[];
+    move: {
+      name: string;
+      movedamageclass?: { name: string };
+    }[];
   };
 }
 

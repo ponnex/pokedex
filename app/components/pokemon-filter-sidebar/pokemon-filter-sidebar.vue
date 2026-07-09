@@ -66,17 +66,27 @@
 					</section>
 					<section>
 						<h3 class="text-xs font-bold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-2">Moves</h3>
-						<input
-							v-model="moveSearch"
-							type="search"
-							placeholder="Search moves"
-							autocomplete="off"
-							aria-label="Search moves"
-							class="w-full font-medium text-sm text-gray-600 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 bg-gray-100 dark:bg-gray-800 rounded-xl py-1.5 px-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:focus-visible:ring-white"
-						>
-						<div v-if="moveSuggestions.length" class="mt-2 flex flex-wrap gap-2">
+						<div class="flex flex-wrap gap-2" role="group" aria-label="Browse moves by category">
 							<button
-								v-for="move in moveSuggestions"
+								v-for="damageClass in MOVE_CATEGORIES"
+								:key="damageClass"
+								type="button"
+								:aria-pressed="selectedMoveCategory === damageClass"
+								class="px-3 py-1.5 rounded-xl cursor-pointer text-xs font-bold transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:focus-visible:ring-white"
+								:class="selectedMoveCategory === damageClass
+									? 'bg-red-600 text-white shadow-md'
+									: 'bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700'"
+								@click="toggleMoveCategory(damageClass)"
+							>
+								{{ startCase(damageClass) }}
+							</button>
+						</div>
+						<div
+							v-if="categoryMoves.length"
+							class="mt-2 max-h-48 overflow-y-auto rounded-xl border border-gray-200 dark:border-gray-700 p-2 flex flex-wrap gap-2"
+						>
+							<button
+								v-for="move in categoryMoves"
 								:key="move"
 								type="button"
 								class="px-3 py-1.5 rounded-xl cursor-pointer text-xs font-bold bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:focus-visible:ring-white"
@@ -166,28 +176,32 @@ const emit = defineEmits<{
 
 const pokemonStore = usePokemonStore();
 
-const moveSearch = ref('');
+const MOVE_CATEGORIES = [ 'physical', 'special', 'status' ];
 
-// Load the move-name list the first time the sidebar opens
+const selectedMoveCategory = ref('');
+
+// Load the move list the first time the sidebar opens
 watch(() => props.open, (open) => {
 	if (open) {
-		pokemonStore.getMoveNames();
+		pokemonStore.getMoveIndex();
 	}
 }, { immediate: true });
 
-const moveSuggestions = computed(() => {
-	const search = moveSearch.value.trim().toLowerCase();
-	if (search.length < 2) {
+const categoryMoves = computed(() => {
+	if (!selectedMoveCategory.value) {
 		return [];
 	}
-	return pokemonStore.moveNames
-		.filter(move => move.includes(search) && !props.modelValue.moves.includes(move))
-		.slice(0, 8);
+	return pokemonStore.moveIndex
+		.filter(move => move.damageClass === selectedMoveCategory.value && !props.modelValue.moves.includes(move.name))
+		.map(move => move.name);
 });
+
+const toggleMoveCategory = (damageClass: string) => {
+	selectedMoveCategory.value = selectedMoveCategory.value === damageClass ? '' : damageClass;
+};
 
 const addMove = (move: string) => {
 	updateFilters({ moves: [ ...props.modelValue.moves, move ] });
-	moveSearch.value = '';
 };
 
 const removeMove = (move: string) => {
