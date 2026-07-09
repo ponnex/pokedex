@@ -60,7 +60,7 @@ const toggleType = (type: string) => {
 
 /*
 	Idle chips are a subtle neutral; the type color (from the global type
-	classes) shows through on hover and while active
+	classes) shows through on hover (as a faded preview) and solid while active
 */
 .type-chip:not(.type-chip--active):not(:hover) {
 	background: rgba(148, 163, 184, 0.22);
@@ -72,5 +72,14 @@ const toggleType = (type: string) => {
 	.type-name {
 		color: rgb(120, 130, 145);
 	}
+}
+
+.type-chip:not(.type-chip--active):hover {
+	opacity: 0.55;
+}
+
+.type-chip--active {
+	outline: 2px solid rgba(0, 0, 0, 0.25);
+	outline-offset: 1px;
 }
 </style>
