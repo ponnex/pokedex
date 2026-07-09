@@ -17,6 +17,14 @@ export interface EvolutionStage {
   minLevel: number | null;
 }
 
+// One species in a flattened root→leaf evolution path; minLevelToNext
+// belongs to the edge leading to the following node (null on the last)
+export interface EvolutionPathNode {
+  id: number;
+  name: string;
+  minLevelToNext: number | null;
+}
+
 export interface PokemonDetails {
   id: number;
   name: string;

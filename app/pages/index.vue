@@ -141,7 +141,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="min-w-full bottom-0 fixed flex h-14 pb-4 items-center justify-center gap-x-8 bg-white dark:bg-gray-900 text-gray-700 dark:text-white">
+		<div class="fixed inset-x-0 bottom-0 flex h-14 pb-4 items-center justify-center gap-x-8 bg-white dark:bg-gray-900 text-gray-700 dark:text-white">
 			<template v-if="!isFiltering">
 				<button
 					type="button"

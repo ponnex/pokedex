@@ -132,13 +132,13 @@
 					</section>
 					<section>
 						<h2 class="font-black text-xl" :class="`text-${pokemonColor()}`">Evolution</h2>
-						<div v-if="evolutionStages.length" class="flex flex-col items-center mt-4 space-y-6">
-							<div v-for="(evolutionStage, evolutionStageIdx) in evolutionStages" :key="evolutionStageIdx">
-								<pokemon-evolution-stage
-									:evolution-stage="evolutionStage"
-									:pokemon-color="pokemonColor()"
-								/>
-							</div>
+						<div v-if="evolutionPaths.length" class="flex flex-col items-center mt-4 space-y-6 w-full">
+							<pokemon-evolution-stage
+								v-for="(path, pathIdx) in evolutionPaths"
+								:key="pathIdx"
+								:path="path"
+								:pokemon-color="pokemonColor()"
+							/>
 						</div>
 						<p v-else class="mt-4 text-sm text-center" :class="`text-${pokemonColor()}`">This Pokémon does not evolve.</p>
 					</section>
@@ -163,6 +163,7 @@
 <script setup lang="ts">
 import { padStart, startCase } from 'lodash-es';
 import type { Type } from '~/types/pokemon';
+import type { EvolutionPathNode, EvolutionStageSpecies } from '~/types/pokemon-details';
 
 // Match Nuxt 2 keep-alive semantics: one cached page instance per path
 definePageMeta({
@@ -200,8 +201,41 @@ const pokemonImage = computed(() => {
 	return pokemon.value ? officialArtworkUrl(pokemon.value.id) : '';
 });
 
-const evolutionStages = computed(() => {
-	return pokemon.value?.evolutionStages ?? [];
+// Flatten the (from → to) stage pairs into full root→leaf paths so each chain
+// renders as one linear row. Branching families (e.g. Eevee) yield one row
+// per branch instead of a tree.
+const evolutionPaths = computed<EvolutionPathNode[][]>(() => {
+	const stages = pokemon.value?.evolutionStages ?? [];
+	if (!stages.length) {
+		return [];
+	}
+	const stagesByFromId = new Map<number, typeof stages>();
+	const evolveToIds = new Set(stages.map(stage => stage.evolveTo.id));
+	for (const stage of stages) {
+		const siblings = stagesByFromId.get(stage.evolveFrom.id) ?? [];
+		siblings.push(stage);
+		stagesByFromId.set(stage.evolveFrom.id, siblings);
+	}
+	const paths: EvolutionPathNode[][] = [];
+	const walk = (species: EvolutionStageSpecies, trail: EvolutionPathNode[]) => {
+		const children = stagesByFromId.get(species.id) ?? [];
+		if (!children.length) {
+			paths.push([...trail, { id: species.id, name: species.name, minLevelToNext: null }]);
+			return;
+		}
+		for (const stage of children) {
+			walk(stage.evolveTo, [...trail, { id: species.id, name: species.name, minLevelToNext: stage.minLevel }]);
+		}
+	};
+	const seenRoots = new Set<number>();
+	for (const stage of stages) {
+		if (evolveToIds.has(stage.evolveFrom.id) || seenRoots.has(stage.evolveFrom.id)) {
+			continue;
+		}
+		seenRoots.add(stage.evolveFrom.id);
+		walk(stage.evolveFrom, []);
+	}
+	return paths;
 });
 
 const pokedexData = computed(() => {
