@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div ref="card-root">
 		<div
 			v-show="pokemonSpecies && !pending"
 			class="relative inline-grid grid-cols-3 gap-x-4 rounded-2xl min-w-full h-24 2xl:h-auto text-white dark:text-black shadow cursor-pointer"
@@ -115,21 +115,44 @@ const pokemonTypes = () => {
 	return pokemonDetails.value ? pokemonDetails.value.types : [];
 };
 
-// Fetch on setup (replaces the Nuxt 2 non-blocking `fetch()` hook)
+const cardRootEl = useTemplateRef<HTMLElement>('card-root');
+// Cards only fetch once scrolled near the viewport — fetching all cards on
+// mount floods PokeAPI with hundreds of requests on filtered/searched lists
+const isVisible = ref(false);
+let observer: IntersectionObserver | undefined;
+
 const fetchPokemon = async() => {
 	pending.value = true;
 	if (props.pokemon) {
-		await pokemonStore.getPokemon(props.pokemon.name);
-		await pokemonStore.getPokemonSpecies(props.pokemon.name);
+		await Promise.all([
+			pokemonStore.getPokemon(props.pokemon.name),
+			pokemonStore.getPokemonSpecies(props.pokemon.name),
+		]);
 	}
 	pending.value = false;
 };
 
-watch(() => props.pokemon, () => {
-	fetchPokemon();
+watch([ () => props.pokemon, isVisible ], () => {
+	if (isVisible.value) {
+		fetchPokemon();
+	}
+}, { immediate: true });
+
+onMounted(() => {
+	observer = new IntersectionObserver((entries) => {
+		if (entries.some(entry => entry.isIntersecting)) {
+			isVisible.value = true;
+			observer?.disconnect();
+		}
+	}, { rootMargin: '300px' });
+	if (cardRootEl.value) {
+		observer.observe(cardRootEl.value);
+	}
 });
 
-fetchPokemon();
+onBeforeUnmount(() => {
+	observer?.disconnect();
+});
 
 const getBgColor = () => {
 	const color = pokemonSpecies.value ? pokemonSpecies.value.color ? pokemonSpecies.value.color.name : 'gray' : 'gray';
