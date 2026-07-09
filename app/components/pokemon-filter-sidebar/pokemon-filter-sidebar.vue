@@ -66,6 +66,14 @@
 					</section>
 					<section>
 						<h3 class="text-xs font-bold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-2">Moves</h3>
+						<input
+							v-model="moveSearch"
+							type="search"
+							placeholder="Search moves"
+							autocomplete="off"
+							aria-label="Search moves"
+							class="w-full mb-2 font-medium text-sm text-gray-600 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 bg-gray-100 dark:bg-gray-800 rounded-xl py-1.5 px-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:focus-visible:ring-white"
+						>
 						<div class="flex flex-wrap gap-2" role="group" aria-label="Browse moves by category">
 							<button
 								v-for="damageClass in MOVE_CATEGORIES"
@@ -179,6 +187,7 @@ const pokemonStore = usePokemonStore();
 const MOVE_CATEGORIES = [ 'physical', 'special', 'status' ];
 
 const selectedMoveCategory = ref('');
+const moveSearch = ref('');
 
 // Load the move list the first time the sidebar opens
 watch(() => props.open, (open) => {
@@ -187,12 +196,23 @@ watch(() => props.open, (open) => {
 	}
 }, { immediate: true });
 
+// Moves shown in the browse panel: narrowed by the selected category, the
+// search text (2+ chars), or both; hidden when neither is active
 const categoryMoves = computed(() => {
-	if (!selectedMoveCategory.value) {
+	const search = moveSearch.value.trim().toLowerCase();
+	if (!selectedMoveCategory.value && search.length < 2) {
 		return [];
 	}
 	return pokemonStore.moveIndex
-		.filter(move => move.damageClass === selectedMoveCategory.value && !props.modelValue.moves.includes(move.name))
+		.filter((move) => {
+			if (props.modelValue.moves.includes(move.name)) {
+				return false;
+			}
+			if (selectedMoveCategory.value && move.damageClass !== selectedMoveCategory.value) {
+				return false;
+			}
+			return search.length < 2 || move.name.includes(search);
+		})
 		.map(move => move.name);
 });
 
