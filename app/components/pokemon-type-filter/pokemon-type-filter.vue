@@ -74,10 +74,6 @@ const toggleType = (type: string) => {
 	}
 }
 
-.type-chip:not(.type-chip--active):hover {
-	opacity: 0.55;
-}
-
 .type-chip--active {
 	outline: 2px solid rgba(0, 0, 0, 0.25);
 	outline-offset: 1px;
