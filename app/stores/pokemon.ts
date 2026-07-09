@@ -22,6 +22,16 @@ export const usePokemonStore = defineStore('pokemon', {
 		nextUrl: '' as string,
 		prevUrl: '' as string,
 	}),
+	getters: {
+		// O(1) lookups for list cards — a `find` over these arrays per card
+		// re-scans on every fetch and stalls large filtered lists
+		pokemonByName: (state) => {
+			return new Map(state.pokemon.map(pokemon => [ pokemon.name, pokemon ]));
+		},
+		pokemonSpeciesByName: (state) => {
+			return new Map(state.pokemonSpecies.map(species => [ species.name, species ]));
+		},
+	},
 	actions: {
 		setListResponse(listResponse: PokemonListResponse) {
 			this.listResponse = listResponse;

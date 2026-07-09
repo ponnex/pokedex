@@ -1,8 +1,8 @@
 <template>
 	<div ref="card-root">
 		<div
-			v-show="pokemonSpecies && !pending"
-			class="relative inline-grid grid-cols-3 gap-x-4 rounded-2xl min-w-full h-24 2xl:h-auto text-white dark:text-black shadow cursor-pointer"
+			v-if="pokemonSpecies && !pending"
+			class="relative inline-grid grid-cols-3 gap-x-4 rounded-2xl min-w-full h-24 2xl:h-44 text-white dark:text-black shadow cursor-pointer"
 			:class="getBgColor()"
 			@click="event => emit('click', event)"
 		>
@@ -27,7 +27,7 @@
 				<img
 					v-if="pokemonImage()"
 					ref="pokemon-image"
-					class="h-24 2xl:h-auto p-2"
+					class="h-24 2xl:h-40 p-2 object-contain"
 					:class="{ 'absolute opacity-0': !isImageLoaded }"
 					:src="pokemonImage()"
 					:alt="pokemon.name"
@@ -46,8 +46,8 @@
 			<span class="absolute bottom-0 dark:text-gray-900 font-semibold leading-9 opacity-50 right-0 text-5xl text-white">{{ pokemonDetails ? `#${padStart(String(pokemonDetails.id), 3, '0')}` : '' }}</span>
 		</div>
 		<div
-			v-if="!pokemonSpecies && pending"
-			class="bg-white cursor-pointer dark:bg-gray-800 dark:text-black gap-x-4 grid-cols-4 2xl:grid-cols-3 inline-grid min-w-full p-4 relative rounded-2xl shadow text-white"
+			v-else
+			class="bg-white cursor-pointer dark:bg-gray-800 dark:text-black gap-x-4 grid-cols-4 2xl:grid-cols-3 inline-grid min-w-full h-24 2xl:h-44 p-4 relative rounded-2xl shadow text-white"
 		>
 			<div class="2xl:h-20 2xl:w-20 bg-gray-200 col-span-1 dark:bg-gray-700 h-16 justify-self-center p-2 rounded self-center w-16"></div>
 			<div class="flex flex-col col-span-3 2xl:col-span-2">
@@ -61,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { find, padStart, startCase } from 'lodash-es';
+import { padStart, startCase } from 'lodash-es';
 import type { PropType } from 'vue';
 import type { PokemonList } from '~/types/pokemon-list';
 import type { Pokemon } from '~/types/pokemon';
@@ -88,15 +88,11 @@ const isImageLoaded = ref(false);
 const pending = ref(true);
 
 const pokemonDetails = computed<Pokemon | undefined>(() => {
-	return find(pokemonStore.pokemon, (pokemon: Pokemon) => {
-		return props.pokemon.name === pokemon.name;
-	});
+	return pokemonStore.pokemonByName.get(props.pokemon.name);
 });
 
 const pokemonSpecies = computed<PokemonSpecies | undefined>(() => {
-	return find(pokemonStore.pokemonSpecies, (pokemon: PokemonSpecies) => {
-		return props.pokemon.name === pokemon.name;
-	});
+	return pokemonStore.pokemonSpeciesByName.get(props.pokemon.name);
 });
 
 const randomSkeletonTypeCount = computed<number>(() => {
@@ -122,6 +118,11 @@ const isVisible = ref(false);
 let observer: IntersectionObserver | undefined;
 
 const fetchPokemon = async() => {
+	// Already cached (e.g. card reused across pagination) — skip the skeleton flash
+	if (pokemonDetails.value && pokemonSpecies.value) {
+		pending.value = false;
+		return;
+	}
 	pending.value = true;
 	if (props.pokemon) {
 		await Promise.all([
