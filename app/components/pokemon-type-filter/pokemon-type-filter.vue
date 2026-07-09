@@ -8,7 +8,7 @@
 				:aria-pressed="isActive(type)"
 				:title="`${capitalize(type)}`"
 				class="flex items-center shrink-0 gap-x-1 px-3 py-1.5 rounded-xl cursor-pointer transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:focus-visible:ring-white"
-				:class="[type, isActive(type) ? 'shadow-md' : 'grayscale opacity-50 hover:opacity-80 hover:grayscale-0']"
+				:class="isActive(type) ? [type, 'shadow-md'] : 'bg-gray-500 dark:bg-gray-700 hover:bg-gray-600 dark:hover:bg-gray-600'"
 				@click="toggleType(type)"
 			>
 				<img
