@@ -85,11 +85,8 @@
 				<span class="block md:pt-4 lg:pt-4 font-medium text-xs text-gray-500 dark:text-white">The Pokédex contains detailed stats for every creature from the Pokémon games.</span>
 			</form>
 		</header>
-		<div v-if="pending" class="flex flex-grow justify-self-center self-center px-5">
-			<div class="grid justify-self-center self-center">
-				<img src="~/assets/images/pokeball_loading.gif" alt="pokeball_loading" class="h-32 justify-self-center self-center">
-				<span class="justify-self-center self-center text-gray-500 dark:text-white">Loading...</span>
-			</div>
+		<div v-if="pending" class="h-auto lg:grid-cols-3 overflow-y-auto mb-5 sm:gap-4 sm:grid sm:grid-cols-2 sm:items-center sm:space-y-0 space-y-3 xl:grid-cols-4 rounded-2xl scrollable">
+			<pokemon-card-skeleton v-for="skeletonIdx in PAGE_SIZE" :key="skeletonIdx" />
 		</div>
 		<div v-else ref="pokemon-list" class="h-auto lg:grid-cols-3 overflow-y-auto mb-5 sm:gap-4 sm:grid sm:grid-cols-2 sm:items-center sm:space-y-0 space-y-3 xl:grid-cols-4 rounded-2xl scrollable">
 			<pokemon-card
