@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="relative inline-grid grid-cols-3 gap-x-4 rounded-2xl min-w-full h-24 2xl:h-44 text-white dark:text-black shadow cursor-pointer"
+		class="relative inline-grid grid-cols-3 gap-x-4 rounded-2xl min-w-full h-24 text-white dark:text-black shadow cursor-pointer"
 		:class="getBgColor()"
 		@click="event => emit('click', event)"
 	>
@@ -25,7 +25,7 @@
 			<img
 				v-if="!isImageBroken"
 				ref="pokemon-image"
-				class="h-24 2xl:h-40 p-2 object-contain"
+				class="h-24 p-2 object-contain"
 				:class="{ 'absolute opacity-0': !isImageLoaded }"
 				:src="officialArtworkUrl(pokemon.id)"
 				:alt="pokemon.name"
