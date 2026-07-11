@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col h-screen max-w-screen-2xl min-h-screen mx-auto p-5 lg:px-12">
+	<div class="flex flex-col h-dvh max-w-screen-2xl mx-auto p-5 lg:px-12">
 		<svg
 			width="104"
 			height="104"

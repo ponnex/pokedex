@@ -1,5 +1,5 @@
 <template>
-	<div class="max-h-screen overflow-hidden text-white">
+	<div class="max-h-dvh overflow-hidden text-white">
 		<div v-show="pokemon && !pending" class="flex flex-col">
 			<div class="fixed w-full z-10 top-0 max-w-screen-2xl">
 				<div :class="`bg-${pokemonColor()}`" :style="headerBgStyle"></div>

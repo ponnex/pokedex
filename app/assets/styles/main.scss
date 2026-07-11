@@ -9,6 +9,11 @@
 */
 
 @layer base {
+	html,
+	body {
+		@apply overflow-hidden;
+	}
+
 	body {
 		@apply min-h-screen bg-white dark:bg-gray-900;
 		@apply text-black dark:text-white;
